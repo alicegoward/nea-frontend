@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,11 +8,19 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 
 class TestService: Service() {
+    private lateinit var locationCallback: LocationCallback
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d("help","here")
         val name = "testName"
@@ -35,10 +44,22 @@ class TestService: Service() {
             .setPriority(NotificationCompat.PRIORITY_MAX).setContentIntent(pendingIntent)
         ServiceCompat.startForeground(this,100,builder.build(),ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE)
         Log.d("help","endhere")
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                for (location in p0.locations){
+                    Log.d("location",location.latitude.toString())
+                }
+            }
+        }
+        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper())
         return START_STICKY
     }
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
+
+
 }
