@@ -9,8 +9,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,41 +32,63 @@ import com.google.android.gms.location.Priority
 
 
 class MainActivity : ComponentActivity() {
+    private var buttonText = "help"
+    private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
+    private lateinit var singlePermission: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            runService()
-        }
-        else {
-            requestPermissions()
-        }
-        enableEdgeToEdge()
-        setContent {
-            LocationScreen()
-        }
-    }
-
-    private fun runService() {
-        val fgIntent = Intent(this, TestService::class.java)
-        val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    Log.d("permission","yes")
-                    startForegroundService(fgIntent)
-                } else {
-                    Log.d("permission","not enough to run foreground")
-                }
+        singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            isGranted ->
+            run {
+                Log.d("permission", isGranted.toString())
+                checkPermissions(false)
             }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d("Starting service","aa")
-            startForegroundService(fgIntent)
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
+        multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            isGranted ->
+            run {
+                Log.d("multi permission", isGranted.toString())
+                checkPermissions(false)
+            }
+        }
+        checkPermissions(false)
+        enableEdgeToEdge()
+        updateScreen();
+    }
+    private fun checkPermissions(clicked : Boolean) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            buttonText = "Notification permission"
+            if( clicked ) {
+                singlePermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            buttonText = "Location permission"
+            if( clicked ) {
+                multiplePermission.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    )
+                )
+            }
+        } else {
+            buttonText="We have all our permissions :)"
+            startForegroundService(Intent(this, TestService::class.java))
+        }
+        updateScreen();
     }
 
+    private fun updateScreen() {
+        setContent{
+            PermissionScreen()
+        }
+    }
     @Composable
-    fun LocationScreen() {
+    fun PermissionScreen() {
+        Button(content = {Text(text=buttonText)},
+            onClick = {checkPermissions(true)},
+            modifier = Modifier.padding(60.dp))
         val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         lateinit var locationCallback: LocationCallback
         var locationText by remember { mutableStateOf("unknown location") }
@@ -81,23 +105,6 @@ class MainActivity : ComponentActivity() {
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
             }
         }
-        Text(text = locationText, modifier=Modifier.padding(60.dp))
-    }
-    private fun requestPermissions() {
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            if ( permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-                runService()
-            } else {
-                Log.d("a","not enough perms")
-            }
-        }
-        locationPermissionRequest.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            )
-        )
+        Text(text = locationText, modifier=Modifier.padding(150.dp))
     }
 }
