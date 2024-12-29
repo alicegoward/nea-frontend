@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -11,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
@@ -80,7 +80,6 @@ class MainActivity : ComponentActivity() {
         } else {
             buttonText="Permissions granted"
             permissionsDone = true
-            startForegroundService(Intent(this, TestService::class.java))
         }
     }
     @Composable
@@ -120,6 +119,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DisplayLocation() {
         val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        var running by remember { mutableStateOf(isServiceRunning(this@MainActivity)) }
         lateinit var locationCallback: LocationCallback
         var locationText by remember { mutableStateOf("unknown location") }
         locationCallback = object : LocationCallback() {
@@ -131,6 +131,25 @@ class MainActivity : ComponentActivity() {
         }
         val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
-        Text(text = locationText, modifier=Modifier.padding(150.dp))
+        Column(modifier = Modifier.padding(60.dp)) {
+            Text(text = locationText, modifier = Modifier.padding(bottom = 16.dp))
+            Button(
+                onClick = {
+                    if (!running) {
+                        startForegroundService(Intent(this@MainActivity, TestService::class.java))
+                    } else {
+                        stopService(Intent(this@MainActivity, TestService::class.java))
+                    }
+                    running = !running
+                },
+                content = {
+                    if (running) {
+                        Text("Service running")
+                    } else {
+                        Text("Service not running")
+                    }
+                }
+            )
+        }
     }
 }

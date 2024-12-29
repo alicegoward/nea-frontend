@@ -1,18 +1,15 @@
 package com.example.myapplication
 
-import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -67,9 +64,7 @@ class TestService: Service() {
         }
         val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
         val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper())
-        }
+        fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper())
         return START_STICKY
     }
 
@@ -82,6 +77,4 @@ class TestService: Service() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
         Log.d("aa", "stopped")
     }
-
-
 }
