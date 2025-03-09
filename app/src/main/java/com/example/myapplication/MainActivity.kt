@@ -34,14 +34,20 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
     private var buttonText by mutableStateOf("help")
+    private var data by mutableStateOf("Data")
     private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
     private lateinit var singlePermission: ActivityResultLauncher<String>
     private lateinit var navController: NavHostController
     private var permissionsDone by mutableStateOf(false)
+    private val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -150,6 +156,18 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             )
+            Button(
+                onClick = {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
+                        Log.d("aa", data)
+                    }
+                },
+                content = {
+                    Text("Get data")
+                }
+            )
+            Text(text = data, modifier = Modifier.padding(bottom = 16.dp))
         }
     }
 }
