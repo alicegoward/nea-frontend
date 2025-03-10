@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
@@ -23,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -41,133 +41,159 @@ import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
-    private var buttonText by mutableStateOf("help")
-    private var data by mutableStateOf("Data")
-    private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
-    private lateinit var singlePermission: ActivityResultLauncher<String>
-    private lateinit var navController: NavHostController
-    private var permissionsDone by mutableStateOf(false)
-    private val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+    lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
+    lateinit var singlePermission: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            checkPermissions(true)
-        }
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            checkPermissions(true)
+            checkPermissions(true, singlePermission, multiplePermission, this)
         }
-        checkPermissions(false)
+        singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            checkPermissions(true, singlePermission, multiplePermission, this)
+        }
+        super.onCreate(savedInstanceState)
+        checkPermissions(false, singlePermission, multiplePermission, this)
         enableEdgeToEdge()
         setContent{
-            Navigation()
+            Navigation(this, singlePermission, multiplePermission)
         }
     }
-    private fun checkPermissions(clicked : Boolean) {
-        if (!checkPermission(this,Manifest.permission.POST_NOTIFICATIONS)) {
-            buttonText = "Notification permission"
-            if( clicked ) {
-                singlePermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        } else if (!checkPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)) {
-            buttonText = "Location permission"
-            if( clicked ) {
-                multiplePermission.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
+}
+
+@Composable
+fun Navigation(context: Context,
+               singlePermission: ActivityResultLauncher<String>,
+               multiplePermission: ActivityResultLauncher<Array<String>>) {
+    MyApplicationTheme {
+        Surface {
+            val navController = rememberNavController()
+            Log.d("h","navigation initialised")
+            val startScreen = "permissionScreen"
+            NavHost(navController = navController, startDestination = startScreen) {
+                composable("permissionScreen") {
+                    PermissionScreen(
+                        singlePermission,
+                        multiplePermission,
+                        context = context,
+                        gotoMain = {navController.navigate(("displayLocation"))},
                     )
+                }
+                composable("displayLocation") {
+                    DisplayLocation(context)
+                }
+            }
+        }
+    }
+}
+
+object global {
+
+}
+
+
+@Composable
+fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
+                     multiplePermission: ActivityResultLauncher<Array<String>>,
+                     context: Context,
+                     gotoMain: () -> Unit) {
+    var buttonText by mutableStateOf("help")
+    var permissionsDone by mutableStateOf(false)
+    val (buttonTextMessage, permissionsDoneCheck) = checkPermissions(true,
+        singlePermission, multiplePermission, context)
+    buttonText = buttonTextMessage;
+    permissionsDone = permissionsDoneCheck;
+    Button(content = {Text(text=buttonText)},
+        onClick = {
+            val (buttonTextMessage, permissionsDoneCheck) = checkPermissions(true,
+                singlePermission, multiplePermission, context)
+            buttonText = buttonTextMessage;
+            permissionsDone = permissionsDoneCheck;
+        },
+        modifier = Modifier.padding(60.dp))
+    if (permissionsDone) {
+        LaunchedEffect(true) { gotoMain() }
+    }
+}
+
+private fun checkPermissions(clicked : Boolean,
+                             singlePermission: ActivityResultLauncher<String>,
+                             multiplePermission: ActivityResultLauncher<Array<String>>,
+                             context: Context) : Pair<String, Boolean> {
+    var permissionsDone = false
+    var buttonText = ""
+    if (!checkPermission(context,Manifest.permission.POST_NOTIFICATIONS)) {
+        buttonText = "Notification permission"
+        if( clicked ) {
+            singlePermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    } else if (!checkPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)) {
+        buttonText = "Location permission"
+        if( clicked ) {
+            multiplePermission.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                 )
-            }
-        } else if (!checkPermission(this,Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            buttonText = "Also background permission"
-            if (clicked) {
-                singlePermission.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            }
-        } else {
-            buttonText="Permissions granted"
-            permissionsDone = true
-        }
-    }
-    @Composable
-    fun Navigation() {
-        MyApplicationTheme {
-            Surface {
-                navController = rememberNavController()
-                Log.d("h","navigation initialised")
-                var startScreen = "permissionScreen"
-                if (permissionsDone) {
-                    startScreen = "displayLocation"
-                }
-                NavHost(navController = navController, startDestination = startScreen) {
-                    composable("permissionScreen") {
-                        PermissionScreen(
-                            gotoMain = {navController.navigate(("displayLocation"))},
-                        )
-                    }
-                    composable("displayLocation") {
-                        DisplayLocation()
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun PermissionScreen(gotoMain: () -> Unit) {
-        Button(content = {Text(text=buttonText)},
-            onClick = {checkPermissions(true)},
-            modifier = Modifier.padding(60.dp))
-        if (permissionsDone) {
-            LaunchedEffect(true) { gotoMain() }
-        }
-    }
-
-    @Composable
-    fun DisplayLocation() {
-        val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        var running by remember { mutableStateOf(isServiceRunning(this@MainActivity)) }
-        lateinit var locationCallback: LocationCallback
-        var locationText by remember { mutableStateOf("unknown location") }
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations){
-                    locationText = location.latitude.toString()+" "+location.longitude.toString()
-                }
-            }
-        }
-        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
-        Column(modifier = Modifier.padding(60.dp)) {
-            Text(text = locationText, modifier = Modifier.padding(bottom = 16.dp))
-            Button(
-                onClick = {
-                    if (!running) {
-                        startForegroundService(Intent(this@MainActivity, TestService::class.java))
-                    } else {
-                        stopService(Intent(this@MainActivity, TestService::class.java))
-                    }
-                    running = !running
-                },
-                content = {
-                    if (running) {
-                        Text("Service running")
-                    } else {
-                        Text("Service not running")
-                    }
-                }
             )
-            Button(
-                onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
-                        Log.d("aa", data)
-                    }
-                },
-                content = {
-                    Text("Get data")
-                }
-            )
-            Text(text = data, modifier = Modifier.padding(bottom = 16.dp))
         }
+    } else if (!checkPermission(context,Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+        buttonText = "Also background permission"
+        if (clicked) {
+            singlePermission.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    } else {
+        buttonText="Permissions granted"
+        permissionsDone = true
+    }
+    return Pair(buttonText, permissionsDone)
+}
+
+@Composable
+fun DisplayLocation(context: Context) {
+    var data by mutableStateOf("Data")
+    val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+    val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    var running by remember { mutableStateOf(isServiceRunning(context)) }
+    lateinit var locationCallback: LocationCallback
+    var locationText by remember { mutableStateOf("unknown location") }
+    locationCallback = object : LocationCallback() {
+        override fun onLocationResult(p0: LocationResult) {
+            for (location in p0.locations){
+                locationText = location.latitude.toString()+" "+location.longitude.toString()
+            }
+        }
+    }
+    val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+    fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
+    Column(modifier = Modifier.padding(60.dp)) {
+        Text(text = locationText, modifier = Modifier.padding(bottom = 16.dp))
+        Button(
+            onClick = {
+                if (!running) {
+                    context.startForegroundService(Intent(context, TestService::class.java))
+                } else {
+                    context.stopService(Intent(context, TestService::class.java))
+                }
+                running=!running
+            },
+            content = {
+                if (running) {
+                    Text("Service running")
+                } else {
+                    Text("Service not running")
+                }
+            }
+        )
+        Button(
+            onClick = {
+                CoroutineScope(Dispatchers.IO).launch {
+                    data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
+                    Log.d("aa", data)
+                }
+            },
+            content = {
+                Text("Get data")
+            }
+        )
+        Text(text = data, modifier = Modifier.padding(bottom = 16.dp))
     }
 }
