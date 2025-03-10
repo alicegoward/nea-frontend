@@ -11,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -24,6 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -32,8 +36,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,16 +53,18 @@ class MainActivity : ComponentActivity() {
             checkPermissions(true, singlePermission, multiplePermission, this)
         }
         super.onCreate(savedInstanceState)
+        val viewModel : TestViewModel by viewModels()
         checkPermissions(false, singlePermission, multiplePermission, this)
         enableEdgeToEdge()
         setContent{
-            Navigation(this, singlePermission, multiplePermission)
+            Navigation(this, viewModel, singlePermission, multiplePermission)
         }
     }
 }
 
 @Composable
 fun Navigation(context: Context,
+               viewModel: TestViewModel,
                singlePermission: ActivityResultLauncher<String>,
                multiplePermission: ActivityResultLauncher<Array<String>>) {
     MyApplicationTheme {
@@ -73,26 +77,24 @@ fun Navigation(context: Context,
                     PermissionScreen(
                         singlePermission,
                         multiplePermission,
+                        viewModel,
                         context = context,
                         gotoMain = {navController.navigate(("displayLocation"))},
                     )
                 }
                 composable("displayLocation") {
-                    DisplayLocation(context)
+                    DisplayLocation(viewModel, context)
                 }
             }
         }
     }
 }
 
-object global {
-
-}
-
 
 @Composable
 fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
+                     viewModel: TestViewModel,
                      context: Context,
                      gotoMain: () -> Unit) {
     var buttonText by mutableStateOf("help")
@@ -148,9 +150,7 @@ private fun checkPermissions(clicked : Boolean,
 }
 
 @Composable
-fun DisplayLocation(context: Context) {
-    var data by mutableStateOf("Data")
-    val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+fun DisplayLocation(viewModel: TestViewModel, context: Context) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     var running by remember { mutableStateOf(isServiceRunning(context)) }
     lateinit var locationCallback: LocationCallback
@@ -185,15 +185,12 @@ fun DisplayLocation(context: Context) {
         )
         Button(
             onClick = {
-                CoroutineScope(Dispatchers.IO).launch {
-                    data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
-                    Log.d("aa", data)
-                }
+                viewModel.getData()
             },
             content = {
                 Text("Get data")
             }
         )
-        Text(text = data, modifier = Modifier.padding(bottom = 16.dp))
+        Text(text = viewModel.data, modifier = Modifier.padding(bottom = 16.dp))
     }
 }
