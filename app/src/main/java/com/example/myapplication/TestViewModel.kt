@@ -1,16 +1,27 @@
 package com.example.myapplication
 
+import android.os.Looper
 import androidx.lifecycle.ViewModel
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class TestViewModel : ViewModel() {
+    var permissionsDone by mutableStateOf(false)
+    var buttonText by mutableStateOf("")
+    var running: Boolean by mutableStateOf(false)
     val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
     var data by mutableStateOf("help")
     init {
@@ -22,5 +33,19 @@ class TestViewModel : ViewModel() {
             data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
             Log.d("aa", data)
         }
+    }
+    lateinit var locationCallback: LocationCallback
+    var locationText by  mutableStateOf("unknown location")
+    fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult) {
+                for (location in p0.locations){
+                    locationText =
+                        location.latitude.toString() + " " + location.longitude.toString()
+                }
+            }
+        }
+        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
     }
 }
