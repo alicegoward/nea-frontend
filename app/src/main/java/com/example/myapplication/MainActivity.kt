@@ -11,8 +11,8 @@ import com.example.myapplication.ui.Navigation
 
 
 class MainActivity : ComponentActivity() {
-    lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
-    lateinit var singlePermission: ActivityResultLauncher<String>
+    private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
+    private lateinit var singlePermission: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel : TestViewModel by viewModels()
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {

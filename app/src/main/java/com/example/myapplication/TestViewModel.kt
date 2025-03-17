@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.os.Looper
 import androidx.lifecycle.ViewModel
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,7 +10,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +28,7 @@ class TestViewModel : ViewModel() {
 
     fun getData() {
         CoroutineScope(Dispatchers.IO).launch {
-            data = sampleAPI.getData(Random.nextInt(200).toString()).body().toString()
+            sampleAPI.getData(Random.nextInt(1,5).toString()).body().toString()
             Log.d("aa", data)
         }
     }

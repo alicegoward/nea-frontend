@@ -25,6 +25,7 @@ import java.time.Instant
 
 class TestService: Service() {
     private lateinit var locationCallback: LocationCallback
+    val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d("help","here")
         val name = "testName"
@@ -57,6 +58,8 @@ class TestService: Service() {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
                     CoroutineScope(Dispatchers.IO).launch {
+                        sampleAPI.postData(location_data_model(Instant.now().epochSecond,"aaa", location.latitude,location.longitude)).body().toString();
+                        Log.d("logging location", "done")
                         locationDao.insertLocation(Location(0,Instant.now().epochSecond,location.latitude,location.longitude))
                     }
                 }
