@@ -17,7 +17,7 @@ fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
                      viewModel: TestViewModel,
                      context: Context,
-                     gotoMain: () -> Unit) {
+                     gotoLogin: () -> Unit) {
     checkPermissions(true, singlePermission, multiplePermission, context, viewModel)
     Button(content = { Text(text=viewModel.buttonText) },
         onClick = {
@@ -25,6 +25,6 @@ fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
         },
         modifier = Modifier.padding(60.dp))
     if (viewModel.permissionsDone) {
-        LaunchedEffect(true) { gotoMain() }
+        LaunchedEffect(true) { gotoLogin() }
     }
 }

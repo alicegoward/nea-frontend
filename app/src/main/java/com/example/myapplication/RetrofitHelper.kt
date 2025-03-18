@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
 
-    const val baseUrl = "http://192.168.137.1:8000/polls/"
+    const val baseUrl = "http://192.168.137.1:8000/db/"
 
     fun getInstance(): Retrofit {
         return Retrofit.Builder().baseUrl(baseUrl)

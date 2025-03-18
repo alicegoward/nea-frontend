@@ -9,9 +9,13 @@ import retrofit2.http.Path
 interface SampleAPI {
     @GET("detail/{id}")
     suspend fun getData(@Path("id") id: String): Response<SampleData>
+    @GET("user/view/{username}")
+    suspend fun getUserData(@Path("username") username: String): Response<UserInfo>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: location_data_model): Response<success>
+    @POST("user/add")
+    suspend fun postUserData(@Body userDataModel: user_data_model): Response<success>
 }
 
 data class SampleData(
@@ -21,11 +25,20 @@ data class SampleData(
     val success: Boolean
 )
 
+data class UserInfo(
+    val username: String,
+    val success: Boolean
+)
+
 data class location_data_model(
     var datetime: Long,
     var user: String,
     var lat: Double,
     var long: Double
+)
+
+data class user_data_model(
+    var username: String
 )
 
 data class success(

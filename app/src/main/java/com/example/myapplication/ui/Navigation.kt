@@ -30,11 +30,16 @@ fun Navigation(context: Context,
                         multiplePermission,
                         viewModel,
                         context = context,
-                        gotoMain = {navController.navigate(("displayLocation"))},
+                        gotoLogin = {navController.navigate(("loginScreen"))},
                     )
                 }
                 composable("displayLocation") {
                     DisplayLocation(viewModel, context)
+                }
+                composable("loginScreen") {
+                    LoginScreen(viewModel,
+                        context,
+                        gotoMain = {navController.navigate(("displayLocation"))})
                 }
             }
         }

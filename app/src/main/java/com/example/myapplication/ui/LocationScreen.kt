@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.TestService
@@ -22,7 +18,7 @@ import com.google.android.gms.location.LocationServices
 @Composable
 fun DisplayLocation(viewModel: TestViewModel, context: Context) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-    var running by remember { mutableStateOf(isServiceRunning(context)) }
+    viewModel.running = isServiceRunning(context)
     viewModel.getLocation(fusedLocationProviderClient)
     Column(modifier = Modifier.padding(60.dp)) {
         Text(text = viewModel.locationText, modifier = Modifier.padding(bottom = 16.dp))
@@ -36,7 +32,7 @@ fun DisplayLocation(viewModel: TestViewModel, context: Context) {
                 viewModel.running=!viewModel.running
             },
             content = {
-                if (running) { Text("Service running") }
+                if (viewModel.running) { Text("Service running") }
                 else { Text("Service not running") }
             }
         )

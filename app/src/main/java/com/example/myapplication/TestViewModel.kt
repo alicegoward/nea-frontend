@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -22,6 +23,7 @@ class TestViewModel : ViewModel() {
     var running: Boolean by mutableStateOf(false)
     val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
     var data by mutableStateOf("help")
+    var user: String? by mutableStateOf(null)
     init {
         Log.d("aaaa", "view model")
     }
@@ -45,5 +47,16 @@ class TestViewModel : ViewModel() {
         }
         val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
+    }
+
+    fun checkUser(to_check: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sampleAPI.postUserData(user_data_model(to_check))
+            var user_data = sampleAPI.getUserData(to_check).body()
+            Log.d("data", user_data.toString())
+            if (user_data?.success == true) {
+                user = to_check
+            }
+        }
     }
 }
