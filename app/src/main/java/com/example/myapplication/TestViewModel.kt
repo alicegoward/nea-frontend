@@ -13,7 +13,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -23,6 +22,7 @@ class TestViewModel : ViewModel() {
     var running: Boolean by mutableStateOf(false)
     val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
     var data by mutableStateOf("help")
+    var create_account by mutableStateOf(false)
     var user: String? by mutableStateOf(null)
     init {
         Log.d("aaaa", "view model")
@@ -49,10 +49,19 @@ class TestViewModel : ViewModel() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
     }
 
-    fun checkUser(to_check: String) {
+    fun createUser(to_check: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.postUserData(user_data_model(to_check))
-            var user_data = sampleAPI.getUserData(to_check).body()
+            var status = sampleAPI.postUserData(user_data_model(to_check, password)).body()
+            Log.d("user create status", status.toString())
+            if (status?.success == true) {
+                user = to_check
+            }
+        }
+    }
+
+    fun loginUser(to_check: String, password: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            var user_data = sampleAPI.getUserData(to_check, password).body()
             Log.d("data", user_data.toString())
             if (user_data?.success == true) {
                 user = to_check
