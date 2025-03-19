@@ -24,6 +24,7 @@ class TestViewModel : ViewModel() {
     var data by mutableStateOf("help")
     var create_account by mutableStateOf(false)
     var user: String? by mutableStateOf(null)
+    var error_text: String? by mutableStateOf(null)
     init {
         Log.d("aaaa", "view model")
     }
@@ -55,6 +56,9 @@ class TestViewModel : ViewModel() {
             Log.d("user create status", status.toString())
             if (status?.success == true) {
                 user = to_check
+            } else {
+                error_text = status?.reason
+                Log.e("create account", error_text.toString())
             }
         }
     }
@@ -65,6 +69,9 @@ class TestViewModel : ViewModel() {
             Log.d("data", user_data.toString())
             if (user_data?.success == true) {
                 user = to_check
+            } else {
+                error_text = user_data?.reason
+                Log.e("login", error_text.toString())
             }
         }
     }

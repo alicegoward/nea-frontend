@@ -28,7 +28,8 @@ data class SampleData(
 data class UserInfo(
     val username: String,
     val password: String,
-    val success: Boolean
+    val success: Boolean,
+    val reason: String
 )
 
 data class location_data_model(
@@ -44,5 +45,6 @@ data class user_data_model(
 )
 
 data class success(
-    var success: Boolean
+    var success: Boolean,
+    val reason: String
 )
