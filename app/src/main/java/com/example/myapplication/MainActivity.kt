@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions(false, singlePermission, multiplePermission, this, viewModel)
         enableEdgeToEdge()
+        startService(Intent(this, NotificationService::class.java))
         setContent{
             Navigation(this, viewModel, singlePermission, multiplePermission)
         }

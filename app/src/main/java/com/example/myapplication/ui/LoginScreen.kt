@@ -15,17 +15,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.AppDatabase
 import com.example.myapplication.TestViewModel
+import com.example.myapplication.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(viewModel: TestViewModel, context: Context, gotoMain: ()->Unit) {
     var username_attempt by remember { mutableStateOf("")}
     var password_attempt by remember { mutableStateOf("")}
+    val db = AppDatabase.getInstance(context)
+    val userDao = db.UserDao()
+
+    CoroutineScope(Dispatchers.IO).launch {
+        Log.d("user logged in", userDao.getUsername().toString())
+        if (userDao.getUsername().size == 1) {
+            viewModel.user = userDao.getUsername()[0]
+        }
+    }
 
     if (viewModel.user != null) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (userDao.getUsername().isEmpty()) {
+                Log.d("user currently", userDao.getUsername().toString())
+                userDao.insertUser(User(username = viewModel.user!!))
+            }
+        }
         Log.d("user", viewModel.user!!)
         LaunchedEffect(true) { gotoMain() }
     }

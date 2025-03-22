@@ -51,7 +51,7 @@ class TestService: Service() {
         notification.flags = Notification.FLAG_ONGOING_EVENT
         ServiceCompat.startForeground(this,1,notification,ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         val db = AppDatabase.getInstance(this)
-        val locationDao = db.locationDao()
+        val locationDao = db.LocationDao()
         Log.d("help","endhere")
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {

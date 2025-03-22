@@ -18,18 +18,33 @@ data class Location(
     @ColumnInfo(name = "lat") val lat: Double,
     @ColumnInfo(name = "long") val long: Double
 )
+
+@Entity
+data class User(
+    @PrimaryKey val username: String
+)
+
 @Dao
 interface LocationDao {
     @Query("SELECT * FROM location")
     suspend fun getAll(): List<Location>
-
     @Insert
     suspend fun insertLocation(location: Location)
 }
 
-@Database(entities = [Location::class], version = 2)
+@Dao
+interface UserDao {
+    @Query("SELECT USERNAME from User")
+    suspend fun getUsername(): List<String>
+
+    @Insert
+    suspend fun insertUser(user: User)
+}
+
+@Database(entities = [Location::class, User::class], version = 6)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun locationDao(): LocationDao
+    abstract fun LocationDao(): LocationDao
+    abstract fun UserDao(): UserDao
     companion object {
         private var INSTANCE: AppDatabase? = null
         fun getInstance(context: Context): AppDatabase {

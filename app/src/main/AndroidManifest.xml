@@ -36,6 +36,7 @@
             android:foregroundServiceType="location"
             android:exported="false">
         </service>
+        <service android:name="com.example.myapplication.NotificationService"/>
     </application>
 
 </manifest>

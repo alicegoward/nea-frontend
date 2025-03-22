@@ -11,6 +11,8 @@ interface SampleAPI {
     suspend fun getData(@Path("id") id: String): Response<SampleData>
     @GET("user/view/{username}/{password}")
     suspend fun getUserData(@Path("username") username: String, @Path("password") password: String): Response<UserInfo>
+    @GET("notifications/{id}")
+    suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: location_data_model): Response<success>
@@ -23,6 +25,11 @@ data class SampleData(
     val question_text: String,
     val pub_date: String,
     val success: Boolean
+)
+
+data class NotificationData(
+    val notifications: HashMap<Int, String>,
+    val success: Boolean,
 )
 
 data class UserInfo(
