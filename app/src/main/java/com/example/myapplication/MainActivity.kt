@@ -9,6 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.example.myapplication.ui.Navigation
+import org.osmdroid.config.Configuration
+import org.osmdroid.library.BuildConfig
 
 
 class MainActivity : ComponentActivity() {
@@ -16,6 +18,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var singlePermission: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel : TestViewModel by viewModels()
+        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             checkPermissions(true, singlePermission, multiplePermission, this, viewModel)
         }

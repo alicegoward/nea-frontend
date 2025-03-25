@@ -39,7 +39,20 @@ fun Navigation(context: Context,
                 composable("loginScreen") {
                     LoginScreen(viewModel,
                         context,
-                        gotoMain = {navController.navigate(("displayLocation"))})
+                        gotoMain = {navController.navigate(("mapScreen"))})
+                }
+                composable("mapScreen") {
+                    OsmdroidMapView(
+                        viewModel = viewModel,
+                        context = context,
+                        gotoFriends = {navController.navigate(("friendScreen"))})
+                }
+                composable("friendScreen") {
+                    FriendScreen(
+                        viewModel = viewModel,
+                        context = context,
+                        gotoMap = {navController.navigate(("mapScreen"))}
+                    )
                 }
             }
         }

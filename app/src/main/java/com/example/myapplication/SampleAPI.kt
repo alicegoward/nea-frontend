@@ -13,11 +13,15 @@ interface SampleAPI {
     suspend fun getUserData(@Path("username") username: String, @Path("password") password: String): Response<UserInfo>
     @GET("notifications/{id}")
     suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
+    @GET("friends/{id}")
+    suspend fun getFriends(@Path("id") id: String): Response<Friends>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: location_data_model): Response<success>
     @POST("user/add")
     suspend fun postUserData(@Body userDataModel: user_data_model): Response<success>
+    @POST("add_friend")
+    suspend fun addFriend(@Body addFriendModel: add_friend_model): Response<success>
 }
 
 data class SampleData(
@@ -51,7 +55,17 @@ data class user_data_model(
     val password: String
 )
 
+data class add_friend_model(
+    val user_requesting: String,
+    val user_requested: String
+)
+
 data class success(
     var success: Boolean,
     val reason: String
+)
+
+data class Friends(
+    var success: Boolean,
+    val names: HashMap<Int, String>
 )
