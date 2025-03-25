@@ -15,6 +15,8 @@ interface SampleAPI {
     suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
     @GET("friends/{id}")
     suspend fun getFriends(@Path("id") id: String): Response<Friends>
+    @GET("friend_requests/{id}")
+    suspend fun getPendingRequests(@Path("id") id: String): Response<Friends>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: location_data_model): Response<success>
@@ -22,6 +24,8 @@ interface SampleAPI {
     suspend fun postUserData(@Body userDataModel: user_data_model): Response<success>
     @POST("add_friend")
     suspend fun addFriend(@Body addFriendModel: add_friend_model): Response<success>
+    @POST("update_friend_state")
+    suspend fun updateRequest(@Body updateRequestModel: update_request_model): Response<success>
 }
 
 data class SampleData(
@@ -68,4 +72,10 @@ data class success(
 data class Friends(
     var success: Boolean,
     val names: HashMap<Int, String>
+)
+
+data class update_request_model(
+    var user_accepting: String,
+    val user_accepted: String,
+    val result: String
 )

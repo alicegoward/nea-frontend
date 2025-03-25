@@ -27,18 +27,27 @@ class NotificationService : Service() {
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("aa")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
+        val userDao = AppDatabase.getInstance(this).UserDao()
+        var user: String? = null
         CoroutineScope(Dispatchers.IO).launch {
             while (true) {
-                val sampleAPI: SampleAPI =
-                    RetrofitHelper.getInstance().create(SampleAPI::class.java)
-                val data = sampleAPI.getNotificationData("a",).body()?.notifications
-                data?.forEach { entry ->
-                    Log.d("notification", entry.value)
-                    notificationManager.notify(
-                        Random.nextInt(0, 1000),
-                        builder.setContentText(entry.value).build()
-                    )
+                if (user == null) {
+                    val usernames = userDao.getUsername()
+                    if (usernames.size == 1) {
+                        user = usernames[0]
+                    }
+                }
+                if (user != null) {
+                    val sampleAPI: SampleAPI =
+                        RetrofitHelper.getInstance().create(SampleAPI::class.java)
+                    val data = sampleAPI.getNotificationData(user!!).body()?.notifications
+                    data?.forEach { entry ->
+                        Log.d("notification", entry.value)
+                        notificationManager.notify(
+                            Random.nextInt(0, 1000),
+                            builder.setContentText(entry.value).build()
+                        )
+                    }
                 }
                 Thread.sleep(30000)
             }

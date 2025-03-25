@@ -23,6 +23,7 @@ import kotlin.random.Random
 
 class TestViewModel : ViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
+    var pending_requests: MutableCollection<String>? by mutableStateOf(null)
     var permissionsDone by mutableStateOf(false)
     var buttonText by mutableStateOf("")
     var running: Boolean by mutableStateOf(false)
@@ -89,12 +90,23 @@ class TestViewModel : ViewModel() {
 
     fun getFriends() {
         CoroutineScope(Dispatchers.IO).launch {
-            if (friends == null) {
-                friends = sampleAPI.getFriends(user!!).body()?.names?.values
-                Log.d("friends!!", sampleAPI.getFriends(user!!).body().toString())
-            }
+            friends = sampleAPI.getFriends(user!!).body()?.names?.values
+
         }
     }
+
+    fun getPendingRequests() {
+        CoroutineScope(Dispatchers.IO).launch {
+            pending_requests = sampleAPI.getPendingRequests(user!!).body()?.names?.values
+        }
+    }
+
+    fun update_request(request: String, state: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sampleAPI.updateRequest(update_request_model(user!!, request, state))
+        }
+    }
+
 
     fun addFriend(to_add: String) {
         CoroutineScope(Dispatchers.IO).launch {
