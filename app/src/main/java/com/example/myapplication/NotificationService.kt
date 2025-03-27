@@ -37,6 +37,7 @@ class NotificationService : Service() {
                         user = usernames[0]
                     }
                 }
+                Log.d("maybe notification",user.toString())
                 if (user != null) {
                     val sampleAPI: SampleAPI =
                         RetrofitHelper.getInstance().create(SampleAPI::class.java)

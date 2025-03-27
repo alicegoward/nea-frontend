@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.room.util.query
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -16,10 +15,8 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-import kotlin.random.Random
 
 class TestViewModel : ViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
@@ -34,16 +31,6 @@ class TestViewModel : ViewModel() {
     var error_text: String? by mutableStateOf(null)
     var error_add_friend: String? by mutableStateOf(null)
     var position by mutableStateOf(GeoPoint(0.0,0.0))
-    init {
-        Log.d("aaaa", "view model")
-    }
-
-    fun getData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.getData(Random.nextInt(1,5).toString()).body().toString()
-            Log.d("aa", data)
-        }
-    }
     lateinit var locationCallback: LocationCallback
     var locationText by  mutableStateOf("unknown location")
     @SuppressLint("MissingPermission")
@@ -64,7 +51,7 @@ class TestViewModel : ViewModel() {
 
     fun createUser(to_check: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            var status = sampleAPI.postUserData(user_data_model(to_check, password)).body()
+            var status = sampleAPI.postUserData(UsernamePassword(to_check, password)).body()
             Log.d("user create status", status.toString())
             if (status?.success == true) {
                 user = to_check
@@ -77,7 +64,7 @@ class TestViewModel : ViewModel() {
 
     fun loginUser(to_check: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            var user_data = sampleAPI.getUserData(to_check, password).body()
+            val user_data = sampleAPI.loginUser(UsernamePassword(to_check, password)).body()
             Log.d("data", user_data.toString())
             if (user_data?.success == true) {
                 user = to_check
@@ -90,8 +77,9 @@ class TestViewModel : ViewModel() {
 
     fun getFriends() {
         CoroutineScope(Dispatchers.IO).launch {
-            friends = sampleAPI.getFriends(user!!).body()?.names?.values
-
+            if (user != null) {
+                friends = sampleAPI.getFriends(user!!).body()?.names?.values
+            }
         }
     }
 
@@ -103,16 +91,18 @@ class TestViewModel : ViewModel() {
 
     fun update_request(request: String, state: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.updateRequest(update_request_model(user!!, request, state))
+            sampleAPI.updateRequest(UpdateRequest(user!!, request, state))
+            this@TestViewModel.getFriends()
+            this@TestViewModel.getPendingRequests()
         }
     }
 
 
     fun addFriend(to_add: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            error_add_friend = sampleAPI.addFriend(add_friend_model(
-                user_requesting = user!!,
-                user_requested = to_add
+            error_add_friend = sampleAPI.addFriend(AddFriend(
+                userRequesting = user!!,
+                userRequested = to_add
             )).body()?.reason
             getFriends()
         }

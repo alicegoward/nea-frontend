@@ -2,6 +2,7 @@ package com.example.myapplication.ui
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -37,7 +38,7 @@ fun DisplayLocation(viewModel: TestViewModel, context: Context) {
             }
         )
         Button(
-            onClick = { viewModel.getData() },
+            onClick = { Log.d("a","here") },
             content = { Text("Get data") }
         )
         Text(text = viewModel.data, modifier = Modifier.padding(bottom = 16.dp))

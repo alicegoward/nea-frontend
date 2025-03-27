@@ -58,7 +58,7 @@ class TestService: Service() {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
                     CoroutineScope(Dispatchers.IO).launch {
-                        sampleAPI.postData(location_data_model(Instant.now().epochSecond,"aaa", location.latitude,location.longitude)).body().toString();
+                        sampleAPI.postData(LocationData(Instant.now().epochSecond,"aaa", location.latitude,location.longitude)).body().toString();
                         Log.d("logging location", "done")
                         locationDao.insertLocation(Location(0,Instant.now().epochSecond,location.latitude,location.longitude))
                     }

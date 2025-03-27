@@ -22,8 +22,6 @@ import com.example.myapplication.TestViewModel
 
 @Composable
 fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit) {
-    viewModel.getFriends()
-    viewModel.getPendingRequests()
     var current_friend by remember {mutableStateOf("")}
     Column(
         modifier = Modifier
@@ -36,6 +34,8 @@ fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit
             for (friend: String in viewModel.friends!!) {
                 Row { Text(friend) }
             }
+        } else {
+            viewModel.getFriends()
         }
         Text("Friend requests:")
         if (viewModel.pending_requests != null) {
@@ -53,6 +53,8 @@ fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit
                     )
                 }
             }
+        } else {
+            viewModel.getPendingRequests()
         }
         Spacer(modifier = Modifier.weight(1F))
         TextField(
@@ -61,7 +63,8 @@ fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit
             label = { Text("Username") },
         )
         Button(
-            onClick = { viewModel.addFriend(current_friend) },
+            onClick = { viewModel.addFriend(current_friend)
+                      current_friend = ""},
             content = { Text("Add friend") }
         )
         if (viewModel.error_add_friend != null) {
