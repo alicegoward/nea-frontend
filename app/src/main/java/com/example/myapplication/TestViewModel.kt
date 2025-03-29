@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -20,6 +19,7 @@ import org.osmdroid.util.GeoPoint
 
 class TestViewModel : ViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
+    var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
     var pending_requests: MutableCollection<String>? by mutableStateOf(null)
     var permissionsDone by mutableStateOf(false)
     var buttonText by mutableStateOf("")
@@ -78,22 +78,20 @@ class TestViewModel : ViewModel() {
     fun getFriends() {
         CoroutineScope(Dispatchers.IO).launch {
             if (user != null) {
-                friends = sampleAPI.getFriends(user!!).body()?.names?.values
+                val data = sampleAPI.getFriends(user!!).body()
+                Log.d("maybe some data", data.toString())
+                friends = data?.names?.values
+                pending_requests = data?.incoming?.values
+                outgoing_requests = data?.outgoing?.values
             }
         }
     }
 
-    fun getPendingRequests() {
-        CoroutineScope(Dispatchers.IO).launch {
-            pending_requests = sampleAPI.getPendingRequests(user!!).body()?.names?.values
-        }
-    }
 
     fun update_request(request: String, state: String) {
         CoroutineScope(Dispatchers.IO).launch {
             sampleAPI.updateRequest(UpdateRequest(user!!, request, state))
             this@TestViewModel.getFriends()
-            this@TestViewModel.getPendingRequests()
         }
     }
 

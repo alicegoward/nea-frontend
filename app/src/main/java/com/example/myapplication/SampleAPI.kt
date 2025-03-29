@@ -19,8 +19,6 @@ interface SampleAPI {
     suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
     @GET("user/friends/{id}")
     suspend fun getFriends(@Path("id") id: String): Response<Friends>
-    @GET("user/friend_requests/{id}")
-    suspend fun getPendingRequests(@Path("id") id: String): Response<Friends>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
@@ -63,7 +61,9 @@ data class Success(
 
 data class Friends(
     val success: Boolean,
-    val names: HashMap<Int, String>
+    val names: HashMap<Int, String>,
+    val incoming: HashMap<Int, String>,
+    val outgoing: HashMap<Int, String>
 )
 
 data class UpdateRequest(

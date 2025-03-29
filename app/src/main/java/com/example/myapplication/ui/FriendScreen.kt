@@ -1,7 +1,6 @@
 package com.example.myapplication.ui
 
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,8 +52,12 @@ fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit
                     )
                 }
             }
-        } else {
-            viewModel.getPendingRequests()
+        }
+        Text("Outgoing requests:")
+        if (viewModel.outgoing_requests != null) {
+            for (request: String in viewModel.outgoing_requests!!) {
+                Row {Text(request)}
+            }
         }
         Spacer(modifier = Modifier.weight(1F))
         TextField(
