@@ -25,7 +25,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
 @Composable
-fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()->Unit) {
+fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()->Unit, gotoRoute: () -> Unit) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     lateinit var mapView: MapView
     viewModel.getLocation(fusedLocationProviderClient)
@@ -70,6 +70,10 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
         Button(
             onClick = { gotoFriends() },
             content = { Text("Friends") }
+        )
+        Button(
+            onClick = { gotoRoute() },
+            content = { Text("Route") }
         )
     }
 }

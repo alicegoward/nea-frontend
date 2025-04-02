@@ -20,7 +20,10 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.TestViewModel
 
 @Composable
-fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit) {
+fun FriendScreen(viewModel: TestViewModel,
+                 context: Context,
+                 gotoMap: () -> Unit,
+                 gotoRoute: () -> Unit) {
     var current_friend by remember {mutableStateOf("")}
     Column(
         modifier = Modifier
@@ -73,9 +76,15 @@ fun FriendScreen(viewModel: TestViewModel, context: Context, gotoMap: () -> Unit
         if (viewModel.error_add_friend != null) {
             Text(viewModel.error_add_friend!!)
         } else { Text("") }
-        Button(
-            onClick = { gotoMap() },
-            content = { Text("Map") }
-        )
+        Row {
+            Button(
+                onClick = { gotoMap() },
+                content = { Text("Map") }
+            )
+            Button(
+                onClick = { gotoRoute() },
+                content = { Text("Route") }
+            )
+        }
     }
 }

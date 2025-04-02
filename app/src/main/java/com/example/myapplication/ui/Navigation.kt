@@ -45,13 +45,21 @@ fun Navigation(context: Context,
                     OsmdroidMapView(
                         viewModel = viewModel,
                         context = context,
-                        gotoFriends = {navController.navigate(("friendScreen"))})
+                        gotoFriends = {navController.navigate(("friendScreen"))},
+                        gotoRoute = { navController.navigate(("routeManagerScreen")) })
                 }
                 composable("friendScreen") {
                     FriendScreen(
                         viewModel = viewModel,
                         context = context,
-                        gotoMap = {navController.navigate(("mapScreen"))}
+                        gotoMap = {navController.navigate(("mapScreen")) },
+                        gotoRoute = {navController.navigate(("routeManagerScreen"))}
+                    )
+                }
+                composable("routeManagerScreen") {
+                    RouteManager(
+                        viewModel = viewModel,
+                        context = context,
                     )
                 }
             }

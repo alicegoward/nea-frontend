@@ -5,6 +5,7 @@ import android.os.Looper
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -16,6 +17,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+
+enum class RouteState {
+    START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END
+}
+
+class Route {
+    var state by mutableStateOf(RouteState.START)
+    var friends = mutableStateListOf<String>()
+    var endLocation by mutableStateOf(GeoPoint(0.0,0.0))
+}
 
 class TestViewModel : ViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
@@ -30,14 +41,16 @@ class TestViewModel : ViewModel() {
     var user: String? by mutableStateOf(null)
     var error_text: String? by mutableStateOf(null)
     var error_add_friend: String? by mutableStateOf(null)
-    var position by mutableStateOf(GeoPoint(0.0,0.0))
-    lateinit var locationCallback: LocationCallback
-    var locationText by  mutableStateOf("unknown location")
+    var position by mutableStateOf(GeoPoint(0.0, 0.0))
+    private lateinit var locationCallback: LocationCallback
+    var locationText by mutableStateOf("unknown location")
+    var routeCreation = Route()
+
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations){
+                for (location in p0.locations) {
                     position = GeoPoint(location.latitude, location.longitude)
                     Log.d("currentlocation", position.toString())
                     locationText =
@@ -45,8 +58,13 @@ class TestViewModel : ViewModel() {
                 }
             }
         }
-        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,locationCallback, Looper.getMainLooper())
+        val locationRequest =
+            LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
     }
 
     fun createUser(to_check: String, password: String) {
@@ -98,10 +116,12 @@ class TestViewModel : ViewModel() {
 
     fun addFriend(to_add: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            error_add_friend = sampleAPI.addFriend(AddFriend(
-                userRequesting = user!!,
-                userRequested = to_add
-            )).body()?.reason
+            error_add_friend = sampleAPI.addFriend(
+                AddFriend(
+                    userRequesting = user!!,
+                    userRequested = to_add
+                )
+            ).body()?.reason
             getFriends()
         }
     }
