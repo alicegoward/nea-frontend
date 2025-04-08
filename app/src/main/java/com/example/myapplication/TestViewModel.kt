@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -28,6 +29,7 @@ class Route {
     var endLocation by mutableStateOf(GeoPoint(0.0,0.0))
     var endDate: Int? = null
     var endTime: Int? = null
+    var name by mutableStateOf("")
     fun toRouteModel(username: String): RouteData {
         val friendDict = HashMap<Int, String>()
         friends.forEachIndexed {idx, item -> friendDict[idx] = item}
@@ -36,9 +38,19 @@ class Route {
             lat = endLocation.latitude,
             long = endLocation.longitude,
             friends = friendDict,
-            username = username
+            username = username,
+            name = name
             )
     }
+}
+
+class RouteInfo(routeData: RouteData) {
+    val name = routeData.name
+    val end_lat = routeData.lat
+    val end_long = routeData.long
+    val admin = routeData.username
+    val participants = routeData.friends
+    val end_time = routeData.endTime
 }
 
 class TestViewModel : ViewModel() {
@@ -58,6 +70,7 @@ class TestViewModel : ViewModel() {
     private lateinit var locationCallback: LocationCallback
     var locationText by mutableStateOf("unknown location")
     var routeCreation = Route()
+    var routes: List<RouteInfo> by mutableStateOf(emptyList())
 
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
@@ -96,7 +109,16 @@ class TestViewModel : ViewModel() {
     fun saveRoute() {
         CoroutineScope(Dispatchers.IO).launch {
             sampleAPI.postRoute(routeCreation.toRouteModel(user!!))
+            Log.d("route","saved")
             routeCreation = Route()
+            getRoutes()
+        }
+    }
+
+    fun getRoutes() {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d("route?", sampleAPI.getRoutes(user!!).body().toString())
+            routes = sampleAPI.getRoutes(user!!).body()!!.data.map {i -> RouteInfo(i.value) }
         }
     }
 

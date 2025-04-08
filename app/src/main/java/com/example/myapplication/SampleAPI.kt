@@ -19,17 +19,24 @@ interface SampleAPI {
     suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
     @GET("user/friends/{id}")
     suspend fun getFriends(@Path("id") id: String): Response<Friends>
+    @GET("route/{id}")
+    suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
 
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
-
 }
+
+data class RouteDataList(
+    val data: HashMap<Int, RouteData>,
+    val success: Boolean
+)
 
 data class RouteData(
     val endTime: Int,
+    val name: String,
     val lat: Double,
     val long: Double,
     val friends: HashMap<Int, String>,

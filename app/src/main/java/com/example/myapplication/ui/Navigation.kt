@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.RouteInfo
 import com.example.myapplication.TestViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -60,6 +61,28 @@ fun Navigation(context: Context,
                     RouteManager(
                         viewModel = viewModel,
                         context = context,
+                        navController = navController
+                    )
+                }
+                composable("route_info/{route_name}") { backStackEntry ->
+                    val route_name = backStackEntry.arguments?.getString("route_name")
+                    var routeInfo: RouteInfo? = null
+                    for (i in viewModel.routes) {
+                        if (i.name == route_name) {
+                            routeInfo = i
+                        }
+                    }
+                    RouteInfo(
+                        route = routeInfo!!,
+                        viewModel = viewModel,
+                        navController = navController
+                    )
+                }
+                composable("create_route") {
+                    CreateRoute(
+                        viewModel = viewModel,
+                        context = context,
+                        navController = navController
                     )
                 }
             }
