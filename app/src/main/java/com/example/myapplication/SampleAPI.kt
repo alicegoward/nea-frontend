@@ -23,7 +23,18 @@ interface SampleAPI {
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
 
+    @POST("route/create")
+    suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
+
 }
+
+data class RouteData(
+    val endTime: Int,
+    val lat: Double,
+    val long: Double,
+    val friends: HashMap<Int, String>,
+    val username: String
+)
 
 data class NotificationData (
     val notifications: HashMap<Int, String>,

@@ -26,6 +26,19 @@ class Route {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
     var endLocation by mutableStateOf(GeoPoint(0.0,0.0))
+    var endDate: Int? = null
+    var endTime: Int? = null
+    fun toRouteModel(username: String): RouteData {
+        val friendDict = HashMap<Int, String>()
+        friends.forEachIndexed {idx, item -> friendDict[idx] = item}
+        return RouteData(
+            endTime = endDate!! + endTime!!,
+            lat = endLocation.latitude,
+            long = endLocation.longitude,
+            friends = friendDict,
+            username = username
+            )
+    }
 }
 
 class TestViewModel : ViewModel() {
@@ -77,6 +90,13 @@ class TestViewModel : ViewModel() {
                 error_text = status?.reason
                 Log.e("create account", error_text.toString())
             }
+        }
+    }
+
+    fun saveRoute() {
+        CoroutineScope(Dispatchers.IO).launch {
+            sampleAPI.postRoute(routeCreation.toRouteModel(user!!))
+            routeCreation = Route()
         }
     }
 

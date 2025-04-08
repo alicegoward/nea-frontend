@@ -1,7 +1,9 @@
 package com.example.myapplication.ui
 
+import android.app.TimePickerDialog
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,14 +12,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.example.myapplication.R
+import com.example.myapplication.Route
 import com.example.myapplication.RouteState
 import com.example.myapplication.TestViewModel
 import org.osmdroid.events.MapListener
@@ -27,6 +42,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import java.util.Calendar
 
 
 @Composable
@@ -35,8 +51,8 @@ fun RouteManager(viewModel: TestViewModel, context: Context) {
         RouteState.START -> start(viewModel)
         RouteState.CHOOSE_FRIENDS -> chooseFriends(viewModel)
         RouteState.CHOOSE_LOCATION -> chooseLocation(viewModel, context)
-        RouteState.CHOOSE_END_TIME -> TODO()
-        RouteState.END -> TODO()
+        RouteState.CHOOSE_END_TIME -> chooseEndTime(viewModel)
+        RouteState.END -> end(viewModel)
     }
 }
 
@@ -44,15 +60,96 @@ fun start(viewModel: TestViewModel) {
     viewModel.routeCreation.state = RouteState.CHOOSE_FRIENDS
 }
 
+fun end(viewModel: TestViewModel) {
+    viewModel.saveRoute()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun chooseEndTime(viewModel: TestViewModel) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    val timePickerState = rememberTimePickerState(
+        initialHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
+        initialMinute = Calendar.getInstance().get(Calendar.MINUTE),
+        is24Hour = true,
+    )
+    Column(modifier = Modifier.padding(60.dp)) {
+        Button(
+            content = { Text("select day") },
+            onClick = { showDatePicker = true }
+        )
+        Button(
+            content = { Text("select time") },
+            onClick = { showTimePicker = true }
+        )
+        Spacer(modifier=Modifier.weight(1F))
+        Row {
+            Button(
+                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_LOCATION },
+                content = { Text("Back") }
+            )
+            Button(
+                onClick = { viewModel.routeCreation.state = RouteState.END },
+                content = { Text("Next") }
+            )
+        }
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis?.toInt()
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+    if (showTimePicker) {
+        Column(modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            TimeInput(
+                state = timePickerState,
+            )
+            Button(onClick = { showTimePicker = false }) {
+                Text("Dismiss picker")
+            }
+            Button(onClick = {
+                viewModel.routeCreation.endTime = (timePickerState.hour*60+timePickerState.minute)*60*1000
+                showTimePicker = false
+            }) {
+                Text("Confirm selection")
+            }
+        }
+    }
+}
+
 @Composable
 fun chooseLocation(viewModel: TestViewModel, context: Context) {
     lateinit var mapView: MapView
     Column(
-        modifier = Modifier.fillMaxSize().padding(60.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(60.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.75F),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.75F),
             factory = { context ->
                 mapView = MapView(context)
                 mapView.setTileSource(TileSourceFactory.MAPNIK)
@@ -112,8 +209,18 @@ fun chooseLocation(viewModel: TestViewModel, context: Context) {
                     }
                 }
             }
-
         )
+        Spacer(modifier=Modifier.weight(1F))
+        Row {
+            Button(
+                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_FRIENDS },
+                content = { Text("Back") }
+            )
+            Button(
+                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_END_TIME },
+                content = { Text("Next") }
+            )
+        }
     }
 
 }
@@ -141,10 +248,6 @@ fun chooseFriends(viewModel: TestViewModel) {
                     }
                 }
             }
-            Button(
-                onClick = { Log.d("friends", viewModel.routeCreation.friends.toString()) },
-                content = { Text("Save") }
-            )
             Spacer(modifier=Modifier.weight(1F))
             Row {
                 Button(
