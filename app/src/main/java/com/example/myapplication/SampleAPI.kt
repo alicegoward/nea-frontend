@@ -19,8 +19,10 @@ interface SampleAPI {
     suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
     @GET("user/friends/{id}")
     suspend fun getFriends(@Path("id") id: String): Response<Friends>
-    @GET("route/{id}")
+    @GET("get_route/{id}")
     suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
+    @GET("route/sample")
+    suspend fun getSampleData(): Response<HashMap<Int, Coordinate>>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
@@ -28,6 +30,11 @@ interface SampleAPI {
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
 }
+
+data class Coordinate(
+    val lat: Double,
+    val long: Double
+)
 
 data class RouteDataList(
     val data: HashMap<Int, RouteData>,

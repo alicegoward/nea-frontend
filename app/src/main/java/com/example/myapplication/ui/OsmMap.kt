@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -23,6 +24,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 
 @Composable
 fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()->Unit, gotoRoute: () -> Unit) {
@@ -54,12 +56,15 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
                         }
+                        val route_line = Polyline()
+                        route_line.setPoints(viewModel.sampleRoute)
                         if (mapView.overlays.isEmpty()) {
                             mapView.overlays.add(location)
+                            mapView.overlays.add(route_line)
                             mapView.controller.setCenter(viewModel.position)
                         } else {
                             mapView.overlays[0] = location
-
+                            mapView.overlays[1] = route_line
                         }
                         mapView.invalidate()
                     }
@@ -74,6 +79,10 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
         Button(
             onClick = { gotoRoute() },
             content = { Text("Route") }
+        )
+        Button(
+            onClick = { viewModel.getSampleData() },
+            content = { Text("get sample map data") }
         )
     }
 }

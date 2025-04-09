@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
@@ -71,6 +72,7 @@ class TestViewModel : ViewModel() {
     var locationText by mutableStateOf("unknown location")
     var routeCreation = Route()
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
+    var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
 
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
@@ -165,6 +167,13 @@ class TestViewModel : ViewModel() {
                 )
             ).body()?.reason
             getFriends()
+        }
+    }
+
+    fun getSampleData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val route_data = sampleAPI.getSampleData().body()
+            sampleRoute = route_data!!.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
         }
     }
 }
