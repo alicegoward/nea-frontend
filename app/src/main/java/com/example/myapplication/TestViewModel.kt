@@ -55,6 +55,7 @@ class RouteInfo(routeData: RouteData) {
 }
 
 class TestViewModel : ViewModel() {
+    var activeRoute: RouteInfo? by mutableStateOf(null)
     var friends: MutableCollection<String>? by mutableStateOf(null)
     var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
     var pending_requests: MutableCollection<String>? by mutableStateOf(null)
@@ -172,8 +173,21 @@ class TestViewModel : ViewModel() {
 
     fun getSampleData() {
         CoroutineScope(Dispatchers.IO).launch {
-            val route_data = sampleAPI.getSampleData().body()
+            val route_data = sampleAPI.getSampleData(hashMapOf(
+                "start" to Coordinate(position.latitude, position.longitude),
+                "end" to Coordinate(activeRoute!!.end_lat, activeRoute!!.end_long)
+            )).body()
             sampleRoute = route_data!!.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
+        }
+    }
+
+    fun activateRoute(route: RouteInfo) {
+        if (route == activeRoute) {
+            activeRoute = null
+            sampleRoute = emptyList()
+        } else {
+            activeRoute = route
+            getSampleData()
         }
     }
 }

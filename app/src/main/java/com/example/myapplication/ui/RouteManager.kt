@@ -27,10 +27,22 @@ fun RouteManager(viewModel: TestViewModel, context: Context, navController: NavC
         .verticalScroll(rememberScrollState())) {
         Text("My routes")
         for (route in viewModel.routes) {
-            Row(modifier = Modifier.padding(30.dp)) {
+            Row(modifier = Modifier.padding(vertical = 30.dp)) {
                 Text(route.name)
                 Spacer(Modifier.weight(1F))
-                Button(onClick = { navController.navigate("route_info/${route.name}") }, content = { Text("more info") })
+                Column {
+                    Button(
+                        onClick = { navController.navigate("route_info/${route.name}") },
+                        content = { Text("more info") }
+                    )
+                    Button(
+                        onClick = { viewModel.activateRoute(route) },
+                        content = {
+                            if (viewModel.activeRoute == route) Text("deactivate")
+                            else Text("activate")
+                        }
+                    )
+                }
             }
         }
         Spacer(Modifier.weight(1F))

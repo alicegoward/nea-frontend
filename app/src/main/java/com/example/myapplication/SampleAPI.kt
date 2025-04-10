@@ -21,14 +21,15 @@ interface SampleAPI {
     suspend fun getFriends(@Path("id") id: String): Response<Friends>
     @GET("get_route/{id}")
     suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
-    @GET("route/sample")
-    suspend fun getSampleData(): Response<HashMap<Int, Coordinate>>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
 
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
+
+    @POST("route/sample")
+    suspend fun getSampleData(@Body startEnd: HashMap<String, Coordinate>): Response<HashMap<Int, Coordinate>>
 }
 
 data class Coordinate(
