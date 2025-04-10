@@ -29,12 +29,18 @@ interface SampleAPI {
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
 
     @POST("route/sample")
-    suspend fun getSampleData(@Body startEnd: HashMap<String, Coordinate>): Response<HashMap<Int, Coordinate>>
+    suspend fun getSampleData(@Body startEnd: Routing): Response<HashMap<Int, Coordinate>>
 }
 
 data class Coordinate(
     val lat: Double,
     val long: Double
+)
+
+data class Routing (
+    val start: Coordinate,
+    val end: Coordinate,
+    val user: String
 )
 
 data class RouteDataList(

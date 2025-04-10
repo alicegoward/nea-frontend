@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -16,7 +15,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
@@ -173,9 +171,10 @@ class TestViewModel : ViewModel() {
 
     fun getSampleData() {
         CoroutineScope(Dispatchers.IO).launch {
-            val route_data = sampleAPI.getSampleData(hashMapOf(
-                "start" to Coordinate(position.latitude, position.longitude),
-                "end" to Coordinate(activeRoute!!.end_lat, activeRoute!!.end_long)
+            val route_data = sampleAPI.getSampleData(Routing(
+                start = Coordinate(position.latitude, position.longitude),
+                end = Coordinate(activeRoute!!.end_lat, activeRoute!!.end_long),
+                user = user!!
             )).body()
             sampleRoute = route_data!!.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
         }
