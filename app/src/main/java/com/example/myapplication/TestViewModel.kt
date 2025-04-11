@@ -78,24 +78,26 @@ class TestViewModel : ViewModel() {
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations) {
-                    if (activeRoute != null) {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val route_data = sampleAPI.postData(
-                                LocationData(
-                                    Instant.now().epochSecond,
-                                    user!!,
-                                    location.latitude,
-                                    location.longitude
-                                )
-                            ).body()
-                            if (route_data != null) {
+                val location = p0.locations[p0.locations.size-1]
+                if (activeRoute != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val route_data = sampleAPI.postData(
+                            LocationData(
+                                Instant.now().epochSecond,
+                                user!!,
+                                location.latitude,
+                                location.longitude
+                            )
+                        ).body()
+                        if (route_data != null) {
+                            if (!route_data.values.isEmpty()) {
                                 sampleRoute = route_data.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             }
                         }
                     }
-                    position = GeoPoint(location.latitude, location.longitude)
                 }
+                position = GeoPoint(location.latitude, location.longitude)
+
             }
         }
         val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
