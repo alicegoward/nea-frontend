@@ -50,17 +50,15 @@ class TestService: Service() {
         val notification = builder.build()
         notification.flags = Notification.FLAG_ONGOING_EVENT
         ServiceCompat.startForeground(this,1,notification,ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-        val db = AppDatabase.getInstance(this)
-        val locationDao = db.LocationDao()
+        val userDao = AppDatabase.getInstance(this).UserDao()
         Log.d("help","endhere")
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
                     CoroutineScope(Dispatchers.IO).launch {
-                        sampleAPI.postData(LocationData(Instant.now().epochSecond,"aaa", location.latitude,location.longitude)).body().toString();
+                        sampleAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], location.latitude,location.longitude)).body().toString();
                         Log.d("logging location", "done")
-                        locationDao.insertLocation(Location(0,Instant.now().epochSecond,location.latitude,location.longitude))
                     }
                 }
             }

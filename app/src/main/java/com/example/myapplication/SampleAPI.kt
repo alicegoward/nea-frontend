@@ -23,13 +23,16 @@ interface SampleAPI {
     suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
 
     @POST("add_location")
-    suspend fun postData(@Body locationDataModel: LocationData): Response<Success>
+    suspend fun postData(@Body locationDataModel: LocationData): Response<HashMap<Int, Coordinate>>
 
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
 
     @POST("route/sample")
     suspend fun getSampleData(@Body startEnd: Routing): Response<HashMap<Int, Coordinate>>
+
+    @POST("route/deactivate/{id}")
+    suspend fun deactivateRoute(@Path("id") id: String): Response<Success>
 }
 
 data class Coordinate(

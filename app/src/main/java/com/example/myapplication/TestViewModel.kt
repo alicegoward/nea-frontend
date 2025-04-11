@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.time.Instant
 
 enum class RouteState {
     START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END
@@ -78,20 +79,28 @@ class TestViewModel : ViewModel() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations) {
+                    if (activeRoute != null) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val route_data = sampleAPI.postData(
+                                LocationData(
+                                    Instant.now().epochSecond,
+                                    user!!,
+                                    location.latitude,
+                                    location.longitude
+                                )
+                            ).body()
+                            if (route_data != null) {
+                                sampleRoute = route_data.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
+                            }
+                        }
+                    }
                     position = GeoPoint(location.latitude, location.longitude)
-                    Log.d("currentlocation", position.toString())
-                    locationText =
-                        location.latitude.toString() + " " + location.longitude.toString()
                 }
             }
         }
-        val locationRequest =
-            LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
+        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
     fun createUser(to_check: String, password: String) {
@@ -184,6 +193,9 @@ class TestViewModel : ViewModel() {
         if (route == activeRoute) {
             activeRoute = null
             sampleRoute = emptyList()
+            CoroutineScope(Dispatchers.IO).launch {
+                sampleAPI.deactivateRoute(user!!)
+            }
         } else {
             activeRoute = route
             getSampleData()
