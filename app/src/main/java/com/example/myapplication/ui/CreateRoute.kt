@@ -106,7 +106,7 @@ fun chooseEndTime(viewModel: TestViewModel) {
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis?.toInt()
+                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis
                     showDatePicker = false
                 }) {
                     Text("OK")
@@ -132,7 +132,7 @@ fun chooseEndTime(viewModel: TestViewModel) {
                 Text("Dismiss picker")
             }
             Button(onClick = {
-                viewModel.routeCreation.endTime = (timePickerState.hour*60+timePickerState.minute)*60*1000
+                viewModel.routeCreation.endTime = timePickerState.hour*60+timePickerState.minute*60*1000
                 showTimePicker = false
             }) {
                 Text("Confirm selection")

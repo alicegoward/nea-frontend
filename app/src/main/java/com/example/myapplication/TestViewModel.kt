@@ -18,6 +18,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.Date
 
 enum class RouteState {
     START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END
@@ -27,7 +31,7 @@ class Route {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
     var endLocation by mutableStateOf(GeoPoint(0.0,0.0))
-    var endDate: Int? = null
+    var endDate: Long? = null
     var endTime: Int? = null
     var name by mutableStateOf("")
     fun toRouteModel(username: String): RouteData {
@@ -73,6 +77,7 @@ class TestViewModel : ViewModel() {
     var routeCreation = Route()
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
     var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
+    var route_dist: Double? by mutableStateOf(null)
 
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
@@ -90,9 +95,8 @@ class TestViewModel : ViewModel() {
                             )
                         ).body()
                         if (route_data != null) {
-                            if (!route_data.values.isEmpty()) {
-                                sampleRoute = route_data.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
-                            }
+                            sampleRoute = route_data.geometry.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
+                            route_dist = route_data.dist
                         }
                     }
                 }
@@ -107,7 +111,7 @@ class TestViewModel : ViewModel() {
 
     fun createUser(to_check: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            var status = sampleAPI.postUserData(UsernamePassword(to_check, password)).body()
+            val status = sampleAPI.postUserData(UsernamePassword(to_check, password)).body()
             Log.d("user create status", status.toString())
             if (status?.success == true) {
                 user = to_check
@@ -184,10 +188,12 @@ class TestViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             val route_data = sampleAPI.getSampleData(Routing(
                 start = Coordinate(position.latitude, position.longitude),
-                end = Coordinate(activeRoute!!.end_lat, activeRoute!!.end_long),
-                user = user!!
+                user = user!!,
+                datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                route = activeRoute!!.name
             )).body()
-            sampleRoute = route_data!!.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
+            sampleRoute = route_data!!.geometry.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
+            route_dist = route_data.dist
         }
     }
 

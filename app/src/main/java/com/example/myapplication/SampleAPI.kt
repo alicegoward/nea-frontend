@@ -23,17 +23,22 @@ interface SampleAPI {
     suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
 
     @POST("add_location")
-    suspend fun postData(@Body locationDataModel: LocationData): Response<HashMap<Int, Coordinate>>
+    suspend fun postData(@Body locationDataModel: LocationData): Response<Track>
 
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
 
     @POST("route/sample")
-    suspend fun getSampleData(@Body startEnd: Routing): Response<HashMap<Int, Coordinate>>
+    suspend fun getSampleData(@Body startEnd: Routing): Response<Track>
 
     @POST("route/deactivate/{id}")
     suspend fun deactivateRoute(@Path("id") id: String): Response<Success>
 }
+
+data class Track(
+    val geometry: HashMap<Int, Coordinate>,
+    val dist: Double
+)
 
 data class Coordinate(
     val lat: Double,
@@ -42,8 +47,9 @@ data class Coordinate(
 
 data class Routing (
     val start: Coordinate,
-    val end: Coordinate,
-    val user: String
+    val user: String,
+    val datetime: Long,
+    val route: String
 )
 
 data class RouteDataList(
@@ -52,7 +58,7 @@ data class RouteDataList(
 )
 
 data class RouteData(
-    val endTime: Int,
+    val endTime: Long,
     val name: String,
     val lat: Double,
     val long: Double,

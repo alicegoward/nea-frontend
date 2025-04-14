@@ -72,6 +72,9 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
             }
         )
         Spacer(modifier = Modifier.weight(1F))
+        if (viewModel.route_dist != null) {
+            Text("distance left: "+viewModel.route_dist.toString())
+        }
         Button(
             onClick = { gotoFriends() },
             content = { Text("Friends") }
