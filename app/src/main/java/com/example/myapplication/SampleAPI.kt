@@ -37,7 +37,8 @@ interface SampleAPI {
 
 data class Track(
     val geometry: HashMap<Int, Coordinate>,
-    val dist: Double
+    val dist: Double,
+    val other_paths: HashMap<String, HashMap<Int, Coordinate>>
 )
 
 data class Coordinate(

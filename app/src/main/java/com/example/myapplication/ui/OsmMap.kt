@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -56,16 +57,22 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
                         }
-                        val route_line = Polyline()
-                        route_line.setPoints(viewModel.sampleRoute)
                         if (mapView.overlays.isEmpty()) {
-                            mapView.overlays.add(location)
-                            mapView.overlays.add(route_line)
                             mapView.controller.setCenter(viewModel.position)
-                        } else {
-                            mapView.overlays[0] = location
-                            mapView.overlays[1] = route_line
                         }
+                        mapView.overlays.clear()
+                        mapView.overlays.add(location)
+                        Log.d("route geometry size", viewModel.other_routes.size.toString())
+                        viewModel.other_routes.forEach {
+                            Log.d("route geometry maybe", it.value.toString())
+                            mapView.overlays.add(Polyline().apply {
+                                setPoints(it.value)
+                                setColor(Color.argb(255,255,0,0))
+                            })
+                        }
+                        mapView.overlays.add(Polyline().apply {
+                            setPoints(viewModel.sampleRoute)
+                        })
                         mapView.invalidate()
                     }
                 }
