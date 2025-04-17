@@ -1,7 +1,11 @@
 package com.example.myapplication.ui
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.example.myapplication.R
 import com.example.myapplication.TestViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -27,17 +30,22 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
+
 @Composable
 fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()->Unit, gotoRoute: () -> Unit) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     lateinit var mapView: MapView
     viewModel.getLocation(fusedLocationProviderClient)
     Column(
-        modifier = Modifier.fillMaxSize().padding(60.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(60.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.75F),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.75F),
             factory = { context ->
                 mapView = MapView(context)
                 mapView.setTileSource(TileSourceFactory.MAPNIK)
@@ -53,7 +61,7 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                         val location = Marker(mapView).apply {
                             position = viewModel.position
                             setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)
+                            icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.ic_launcher_foreground)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
                         }
@@ -68,6 +76,19 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                             mapView.overlays.add(Polyline().apply {
                                 setPoints(it.value)
                                 setColor(Color.argb(255,255,0,0))
+                            })
+                        }
+                        val bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
+                        val paint = Paint().apply {
+                            setColor(Color.argb(255, 0, 0, 255))
+                        }
+                        Canvas(bitmap).drawRect(0F, 0F, 50F, 50F, paint)
+                        viewModel.waypoints.forEach {
+                            mapView.overlays.add(Marker(mapView).apply {
+                                position = it
+                                setInfoWindow(null)
+                                icon = BitmapDrawable(context.resources, bitmap)
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                             })
                         }
                         mapView.overlays.add(Polyline().apply {

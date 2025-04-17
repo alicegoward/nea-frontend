@@ -59,6 +59,7 @@ class RouteInfo(routeData: RouteData) {
 
 class TestViewModel : ViewModel() {
     var other_routes by mutableStateOf(HashMap<String, List<GeoPoint>>())
+    var waypoints: List<GeoPoint> by mutableStateOf(emptyList())
     var activeRoute: RouteInfo? by mutableStateOf(null)
     var friends: MutableCollection<String>? by mutableStateOf(null)
     var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
@@ -101,6 +102,7 @@ class TestViewModel : ViewModel() {
                                 other_routes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             }
                             Log.d("other routes", other_routes.toString())
+                            waypoints = route_data.waypoints.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             route_dist = route_data.dist
                         }
                     }
@@ -201,6 +203,7 @@ class TestViewModel : ViewModel() {
             route_data.other_paths.forEach { (user, path) ->
                 other_routes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
             }
+            waypoints = route_data.waypoints.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
             Log.d("other routes", other_routes.toString())
             route_dist = route_data.dist
         }
