@@ -132,7 +132,7 @@ fun chooseEndTime(viewModel: TestViewModel) {
                 Text("Dismiss picker")
             }
             Button(onClick = {
-                viewModel.routeCreation.endTime = timePickerState.hour*60+timePickerState.minute*60*1000
+                viewModel.routeCreation.endTime = (timePickerState.hour*60+timePickerState.minute)*60*1000
                 showTimePicker = false
             }) {
                 Text("Confirm selection")
