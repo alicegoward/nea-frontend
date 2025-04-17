@@ -18,10 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.Date
 
 enum class RouteState {
     START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END
@@ -92,8 +90,7 @@ class TestViewModel : ViewModel() {
                             LocationData(
                                 Instant.now().epochSecond,
                                 user!!,
-                                location.latitude,
-                                location.longitude
+                                Coordinate(location.latitude, location.longitude)
                             )
                         ).body()
                         if (route_data != null) {
@@ -194,7 +191,7 @@ class TestViewModel : ViewModel() {
     fun getSampleData() {
         CoroutineScope(Dispatchers.IO).launch {
             val route_data = sampleAPI.getSampleData(Routing(
-                start = Coordinate(position.latitude, position.longitude),
+                position = Coordinate(position.latitude, position.longitude),
                 user = user!!,
                 datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 route = activeRoute!!.name

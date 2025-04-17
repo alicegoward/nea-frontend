@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -26,6 +27,7 @@ import java.time.Instant
 class TestService: Service() {
     private lateinit var locationCallback: LocationCallback
     val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d("help","here")
         val name = "testName"
@@ -57,7 +59,7 @@ class TestService: Service() {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
                     CoroutineScope(Dispatchers.IO).launch {
-                        sampleAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], location.latitude,location.longitude)).body().toString();
+                        sampleAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], Coordinate(location.latitude, location.longitude))).body().toString()
                         Log.d("logging location", "done")
                     }
                 }

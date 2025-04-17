@@ -48,7 +48,7 @@ data class Coordinate(
 )
 
 data class Routing (
-    val start: Coordinate,
+    val position: Coordinate,
     val user: String,
     val datetime: Long,
     val route: String
@@ -83,8 +83,7 @@ data class UserInfo (
 data class LocationData (
     val datetime: Long,
     val user: String,
-    val lat: Double,
-    val long: Double
+    val position: Coordinate
 )
 
 data class UsernamePassword(
