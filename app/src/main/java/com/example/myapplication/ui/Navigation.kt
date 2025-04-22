@@ -58,6 +58,7 @@ fun Navigation(context: Context,
                     )
                 }
                 composable("routeManagerScreen") {
+                    viewModel.getRoutes()
                     RouteManager(
                         viewModel = viewModel,
                         context = context,

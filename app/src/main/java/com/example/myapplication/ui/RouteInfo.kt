@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.Route
@@ -72,7 +73,7 @@ fun editParticipants(route_name: String, viewModel: TestViewModel, navController
         if (possible_route.name == route_name) route = possible_route
     }
     viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
-    viewModel.routeCreation.friends = route.participants.values as SnapshotStateList<String>
+    viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
     Column(modifier = Modifier.padding(60.dp)) {
         chooseFriends(viewModel)
         Spacer(Modifier.weight(1F))
@@ -80,12 +81,9 @@ fun editParticipants(route_name: String, viewModel: TestViewModel, navController
             Button(
                 content = { Text("Save") },
                 onClick = {
-                    val friendDict = HashMap<Int, String>()
-                    viewModel.routeCreation.friends.forEachIndexed {idx, item -> friendDict[idx] = item}
-                    viewModel.updateRouteInfo(mapOf(
-                        "friends" to friendDict,
-                        "route" to route_name
-                    ))
+                    val out = hashMapOf("route" to route_name)
+                    viewModel.routeCreation.friends.forEachIndexed {idx, item -> out[idx.toString()] = item}
+                    viewModel.updateRouteInfo(out)
                     navController.navigate("route_info/${route_name}")
                 }
             )
@@ -115,10 +113,14 @@ fun editTime(route_name: String, viewModel: TestViewModel, navController: NavCon
             Button(
                 content = { Text("Save") },
                 onClick = {
+                    Log.d(viewModel.routeCreation.endDate.toString(),
+                        viewModel.routeCreation.endTime.toString()
+                    )
                     viewModel.updateRouteInfo(
                         mapOf(
-                            "time" to viewModel.routeCreation.endDate!! + viewModel.routeCreation.endTime!!,
-                            "route" to route_name))
+                            "time" to (viewModel.routeCreation.endDate!! + viewModel.routeCreation.endTime!!).toString(),
+                            "route" to route_name)
+                    )
                     navController.navigate("route_info/${route_name}")
                 }
             )
@@ -149,10 +151,8 @@ fun editPosition(route_name: String, context: Context, viewModel: TestViewModel,
                 onClick = {
                     viewModel.updateRouteInfo(
                         mapOf(
-                            "location" to mapOf(
-                                "lat" to viewModel.routeCreation.endLocation.latitude,
-                                "long" to viewModel.routeCreation.endLocation.longitude
-                            ),
+                            "lat" to viewModel.routeCreation.endLocation.latitude.toString(),
+                            "long" to viewModel.routeCreation.endLocation.longitude.toString(),
                             "route" to route_name
                         )
                     )

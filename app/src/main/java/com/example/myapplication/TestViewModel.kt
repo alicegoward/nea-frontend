@@ -239,7 +239,11 @@ class TestViewModel : ViewModel() {
             getSampleData()
         }
     }
-    fun updateRouteInfo(data: Map<String, Any>) {
-        Log.d( "updating", data.toString())
+    fun updateRouteInfo(data: Map<String, String>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d("have data", data.toString())
+            sampleAPI.updateRoute(data)
+            this@TestViewModel.getRoutes()
+        }
     }
 }

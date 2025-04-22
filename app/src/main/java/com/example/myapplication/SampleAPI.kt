@@ -33,6 +33,9 @@ interface SampleAPI {
 
     @POST("route/deactivate/{id}")
     suspend fun deactivateRoute(@Path("id") id: String): Response<Success>
+
+    @POST("route/update")
+    suspend fun updateRoute(@Body updateRoute: Map<String, String>): Response<Success>
 }
 
 data class Track(
