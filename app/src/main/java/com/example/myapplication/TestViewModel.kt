@@ -22,16 +22,35 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 enum class RouteState {
-    START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END
+    START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END;
+    fun next(): RouteState {
+        return when (this) {
+            START -> CHOOSE_FRIENDS
+            CHOOSE_FRIENDS -> CHOOSE_LOCATION
+            CHOOSE_LOCATION -> CHOOSE_END_TIME
+            CHOOSE_END_TIME -> END
+            END -> END
+        }
+    }
+    fun prev(): RouteState {
+        return when (this) {
+            START -> START
+            CHOOSE_FRIENDS -> START
+            CHOOSE_LOCATION -> CHOOSE_FRIENDS
+            CHOOSE_END_TIME -> CHOOSE_LOCATION
+            END -> CHOOSE_END_TIME
+        }
+    }
 }
 
-class Route {
+class Route(EndLocation: GeoPoint) {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
-    var endLocation by mutableStateOf(GeoPoint(0.0,0.0))
+    var endLocation by mutableStateOf(EndLocation)
     var endDate: Long? = null
     var endTime: Int? = null
     var name by mutableStateOf("")
+
     fun toRouteModel(username: String): RouteData {
         val friendDict = HashMap<Int, String>()
         friends.forEachIndexed {idx, item -> friendDict[idx] = item}
@@ -41,8 +60,9 @@ class Route {
             long = endLocation.longitude,
             friends = friendDict,
             username = username,
-            name = name
-            )
+            name = name,
+            junction_name = ""
+        )
     }
 }
 
@@ -53,6 +73,7 @@ class RouteInfo(routeData: RouteData) {
     val admin = routeData.username
     val participants = routeData.friends
     val end_time = routeData.endTime
+    val junction_name = routeData.junction_name
 }
 
 class TestViewModel : ViewModel() {
@@ -74,7 +95,7 @@ class TestViewModel : ViewModel() {
     var position by mutableStateOf(GeoPoint(0.0, 0.0))
     private lateinit var locationCallback: LocationCallback
     var locationText by mutableStateOf("unknown location")
-    var routeCreation = Route()
+    var routeCreation = Route(this.position)
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
     var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
     var route_dist: Double? by mutableStateOf(null)
@@ -130,7 +151,7 @@ class TestViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             sampleAPI.postRoute(routeCreation.toRouteModel(user!!))
             Log.d("route","saved")
-            routeCreation = Route()
+            routeCreation = Route(this@TestViewModel.position)
             getRoutes()
         }
     }
@@ -217,5 +238,8 @@ class TestViewModel : ViewModel() {
             activeRoute = route
             getSampleData()
         }
+    }
+    fun updateRouteInfo(data: Map<String, Any>) {
+        Log.d( "updating", data.toString())
     }
 }

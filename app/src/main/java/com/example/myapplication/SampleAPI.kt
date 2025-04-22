@@ -65,7 +65,8 @@ data class RouteData(
     val lat: Double,
     val long: Double,
     val friends: HashMap<Int, String>,
-    val username: String
+    val username: String,
+    val junction_name: String
 )
 
 data class NotificationData (

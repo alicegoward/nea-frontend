@@ -32,7 +32,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.Route
 import com.example.myapplication.RouteState
 import com.example.myapplication.TestViewModel
 import org.osmdroid.events.MapListener
@@ -47,19 +46,35 @@ import java.util.Calendar
 
 @Composable
 fun CreateRoute(viewModel: TestViewModel, context: Context, navController: NavController) {
-    when (viewModel.routeCreation.state) {
-        RouteState.START -> start(viewModel)
-        RouteState.CHOOSE_FRIENDS -> chooseFriends(viewModel)
-        RouteState.CHOOSE_LOCATION -> chooseLocation(viewModel, context)
-        RouteState.CHOOSE_END_TIME -> chooseEndTime(viewModel)
-        RouteState.END -> end(viewModel, navController)
+    Column(Modifier.padding(60.dp)) {
+        when (viewModel.routeCreation.state) {
+            RouteState.START -> start(viewModel)
+            RouteState.CHOOSE_FRIENDS -> chooseFriends(viewModel)
+            RouteState.CHOOSE_LOCATION -> chooseLocation(viewModel, context)
+            RouteState.CHOOSE_END_TIME -> chooseEndTime(viewModel)
+            RouteState.END -> end(viewModel, navController)
+        }
+        Spacer(modifier = Modifier.weight(1F))
+        Row {
+            Button(
+                onClick = { viewModel.routeCreation.state = viewModel.routeCreation.state.prev() },
+                content = { Text("Back") }
+            )
+            Button(
+                onClick = { viewModel.routeCreation.state = viewModel.routeCreation.state.next() },
+                content = { Text("Next") }
+            )
+        }
     }
 }
 
+@Composable
 fun start(viewModel: TestViewModel) {
-    if (viewModel.routeCreation.endTime == null) {
-        viewModel.routeCreation.state = RouteState.CHOOSE_FRIENDS
-    }
+    Text("Route name")
+    TextField(
+        value = viewModel.routeCreation.name,
+        onValueChange = { viewModel.routeCreation.name = it },
+    )
 }
 
 fun end(viewModel: TestViewModel, navController: NavController) {
@@ -79,34 +94,22 @@ fun chooseEndTime(viewModel: TestViewModel) {
         initialMinute = Calendar.getInstance().get(Calendar.MINUTE),
         is24Hour = true,
     )
-    Column(modifier = Modifier.padding(60.dp)) {
-        Button(
-            content = { Text("select day") },
-            onClick = { showDatePicker = true }
-        )
-        Button(
-            content = { Text("select time") },
-            onClick = { showTimePicker = true }
-        )
-        Spacer(modifier= Modifier.weight(1F))
-        Row {
-            Button(
-                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_LOCATION },
-                content = { Text("Back") }
-            )
-            Button(
-                onClick = { viewModel.routeCreation.state = RouteState.END },
-                content = { Text("Next") }
-            )
-        }
-    }
+    Button(
+        content = { Text("select day") },
+        onClick = { showDatePicker = true }
+    )
+    Button(
+        content = { Text("select time") },
+        onClick = { showTimePicker = true }
+    )
+
 
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis
+                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis?.div(1000)
                     showDatePicker = false
                 }) {
                     Text("OK")
@@ -132,7 +135,7 @@ fun chooseEndTime(viewModel: TestViewModel) {
                 Text("Dismiss picker")
             }
             Button(onClick = {
-                viewModel.routeCreation.endTime = (timePickerState.hour*60+timePickerState.minute)*60*1000
+                viewModel.routeCreation.endTime = (timePickerState.hour*60+timePickerState.minute)*60
                 showTimePicker = false
             }) {
                 Text("Confirm selection")
@@ -144,133 +147,95 @@ fun chooseEndTime(viewModel: TestViewModel) {
 @Composable
 fun chooseLocation(viewModel: TestViewModel, context: Context) {
     lateinit var mapView: MapView
-    Column(
+    AndroidView(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(60.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.75F),
-            factory = { context ->
-                mapView = MapView(context)
-                mapView.setTileSource(TileSourceFactory.MAPNIK)
-                mapView.setMultiTouchControls(true)
-                mapView.controller.setCenter(viewModel.position)
-                mapView.controller.setZoom(17.5)
-                mapView
-            },
-            update = {
-                    mapView ->
-                run {
-                    mapView.addMapListener(object: MapListener {
-                        override fun onScroll(event: ScrollEvent?): Boolean {
-                            event?.let {
-                                viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
-                            }
-                            return true
+            .fillMaxWidth()
+            .fillMaxHeight(0.75F),
+        factory = { context ->
+            mapView = MapView(context)
+            mapView.setTileSource(TileSourceFactory.MAPNIK)
+            mapView.setMultiTouchControls(true)
+            mapView.controller.setCenter(viewModel.position)
+            mapView.controller.setZoom(17.5)
+            mapView
+        },
+        update = {
+                mapView ->
+            run {
+                mapView.addMapListener(object: MapListener {
+                    override fun onScroll(event: ScrollEvent?): Boolean {
+                        event?.let {
+                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
                         }
-
-                        override fun onZoom(event: ZoomEvent?): Boolean {
-                            event?.let {
-                                viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
-                            }
-                            return true
-                        }
-                    })
-                    if (viewModel.position != GeoPoint(0.0, 0.0)) {
-                        val location = Marker(mapView).apply {
-                            position = viewModel.position
-                            setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(
-                                context,
-                                R.drawable.ic_launcher_foreground
-                            )
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-
-                        }
-                        val endPoint = Marker(mapView).apply {
-                            position = viewModel.routeCreation.endLocation
-                            setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(
-                                context,
-                                R.drawable.ic_launcher_background
-                            )
-                        }
-                        Log.d("location central", viewModel.routeCreation.endLocation.toString())
-                        if (mapView.overlays.isEmpty()) {
-                            mapView.overlays.add(location)
-                            mapView.overlays.add(endPoint)
-                            mapView.controller.setCenter(viewModel.position)
-                        } else {
-                            mapView.overlays[0] = location
-                            mapView.overlays[1] = endPoint
-                        }
-                        Log.d("end location", viewModel.routeCreation.endLocation.toString())
-                        mapView.invalidate()
+                        return true
                     }
+
+                    override fun onZoom(event: ZoomEvent?): Boolean {
+                        event?.let {
+                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
+                        }
+                        return true
+                    }
+                })
+                if (viewModel.position != GeoPoint(0.0, 0.0)) {
+                    val location = Marker(mapView).apply {
+                        position = viewModel.position
+                        setInfoWindow(null)
+                        icon = ContextCompat.getDrawable(
+                            context,
+                            R.drawable.ic_launcher_foreground
+                        )
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+
+                    }
+                    val endPoint = Marker(mapView).apply {
+                        position = viewModel.routeCreation.endLocation
+                        setInfoWindow(null)
+                        icon = ContextCompat.getDrawable(
+                            context,
+                            R.drawable.ic_launcher_background
+                        )
+                    }
+                    Log.d("location central", viewModel.routeCreation.endLocation.toString())
+                    if (mapView.overlays.isEmpty()) {
+                        mapView.overlays.add(location)
+                        mapView.overlays.add(endPoint)
+                        mapView.controller.setCenter(viewModel.position)
+                    } else {
+                        mapView.overlays[0] = location
+                        mapView.overlays[1] = endPoint
+                    }
+                    Log.d("end location", viewModel.routeCreation.endLocation.toString())
+                    mapView.invalidate()
                 }
             }
-        )
-        Spacer(modifier= Modifier.weight(1F))
-        Row {
-            Button(
-                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_FRIENDS },
-                content = { Text("Back") }
-            )
-            Button(
-                onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_END_TIME },
-                content = { Text("Next") }
-            )
         }
-    }
+    )
 
 }
 
 @Composable
 fun chooseFriends(viewModel: TestViewModel) {
-    Column(modifier = Modifier.padding(60.dp)) {
-        if (viewModel.friends != null) {
-            Text("Route name")
-            TextField(
-                value = viewModel.routeCreation.name,
-                onValueChange = { viewModel.routeCreation.name = it },
-            )
-            Spacer(Modifier.weight(1f))
-            Text("Select friends")
-            for (friend: String in viewModel.friends!!) {
-                Row {
-                    Text(friend)
-                    Spacer(modifier = Modifier.weight(1F))
-                    if (friend in viewModel.routeCreation.friends) {
-                        Button(
-                            onClick = { viewModel.routeCreation.friends.remove(friend) },
-                            content = { Text("Remove") }
-                        )
-                    } else {
-                        Button(
-                            onClick = { viewModel.routeCreation.friends.add(friend) },
-                            content = { Text("Add") }
-                        )
-                    }
+    if (viewModel.friends != null) {
+        Text("Select friends")
+        for (friend: String in viewModel.friends!!) {
+            Row {
+                Text(friend)
+                Spacer(modifier = Modifier.weight(1F))
+                if (friend in viewModel.routeCreation.friends) {
+                    Button(
+                        onClick = { viewModel.routeCreation.friends.remove(friend) },
+                        content = { Text("Remove") }
+                    )
+                } else {
+                    Button(
+                        onClick = { viewModel.routeCreation.friends.add(friend) },
+                        content = { Text("Add") }
+                    )
                 }
             }
-            Spacer(modifier= Modifier.weight(1F))
-            Row {
-                Button(
-                    onClick = {},
-                    content = { Text("Back") }
-                )
-                Button(
-                    onClick = { viewModel.routeCreation.state = RouteState.CHOOSE_LOCATION },
-                    content = { Text("Next") }
-                )
-            }
-        } else {
-            viewModel.getFriends()
         }
-
+    } else {
+        viewModel.getFriends()
     }
 }
