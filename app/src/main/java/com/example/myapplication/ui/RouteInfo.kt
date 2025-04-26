@@ -104,6 +104,7 @@ class Choice(val question: String, val options: List<String>, val initial_state:
 
 @Composable
 fun IndividualConfig(viewModel: TestViewModel, route_name: String, navController: NavController) {
+    val route = viewModel.routes.find {it.name == route_name}!!
     Column(
         Modifier
             .verticalScroll(rememberScrollState())
@@ -111,17 +112,17 @@ fun IndividualConfig(viewModel: TestViewModel, route_name: String, navController
         val create_meet_on_route = Choice(
             "Auto create meet on route?",
             listOf("Yes","No"),
-            "No"
+            route.create_mor
         ).apply { init() }
         val meet_on_route_tolerance = Choice(
             "Maximum detour + wait time for meet on route:",
             listOf(1, 2, 5, 10).map {i -> "$i minutes"},
-            "10 minutes"
+            route.mor_tolerance_s
         ).apply { init() }
         val reroute_tolerance = Choice(
             "How many metres before rerouting if you go off course?",
             listOf(20, 50, 100, 200).map {i -> "$i m"},
-            "50 m"
+            route.reroute_tolerance_m
         ).apply { init() }
 
         create_meet_on_route.display()

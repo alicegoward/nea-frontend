@@ -66,8 +66,10 @@ fun Navigation(context: Context,
                     )
                 }
                 composable("notification_config/{route_name}") { backStackEntry ->
+                    val route_name = backStackEntry.arguments?.getString("route_name")!!
+                    viewModel.getIndividualConfig(viewModel.routes.find {it.name == route_name}!!)
                     IndividualConfig(
-                        route_name =  backStackEntry.arguments?.getString("route_name")!!,
+                        route_name =  route_name,
                         viewModel = viewModel,
                         navController = navController
                     )

@@ -64,7 +64,7 @@ class Route(EndLocation: GeoPoint) {
             friends = friendDict,
             username = username,
             name = name,
-            junction_name = ""
+            junction_name = "",
         )
     }
 }
@@ -77,6 +77,9 @@ class RouteInfo(routeData: RouteData) {
     val participants = routeData.friends
     val end_time = routeData.endTime
     val junction_name = routeData.junction_name
+    var create_mor by mutableStateOf("No")
+    var mor_tolerance_s by mutableStateOf("10 minutes")
+    var reroute_tolerance_m by mutableStateOf("50 m")
 }
 
 class TestViewModel : ViewModel() {
@@ -156,6 +159,15 @@ class TestViewModel : ViewModel() {
             Log.d("route","saved")
             routeCreation = Route(this@TestViewModel.position)
             getRoutes()
+        }
+    }
+
+    fun getIndividualConfig(route: RouteInfo) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val config = sampleAPI.getIndividualConfig(UserOnRoute(user!!, route.name)).body()
+            route.create_mor = if (config!!.create_mor) "Yes" else "No"
+            route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
+            route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
         }
     }
 

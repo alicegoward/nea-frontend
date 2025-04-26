@@ -36,6 +36,9 @@ interface SampleAPI {
 
     @POST("route/update")
     suspend fun updateRoute(@Body updateRoute: Map<String, String>): Response<Success>
+
+    @POST("route/get_individual_config")
+    suspend fun getIndividualConfig(@Body userOnRoute: UserOnRoute): Response<ConfigData>
 }
 
 data class Track(
@@ -43,6 +46,19 @@ data class Track(
     val dist: Double,
     val other_paths: HashMap<String, HashMap<Int, Coordinate>>,
     val waypoints: HashMap<Int, Coordinate>
+)
+
+data class UserOnRoute (
+    val user: String,
+    val route: String
+)
+
+data class ConfigData(
+    val user: String,
+    val route: String,
+    val create_mor: Boolean,
+    val mor_tolerance_s: Double,
+    val reroute_tolerance_m: Double
 )
 
 data class Coordinate(
@@ -69,7 +85,7 @@ data class RouteData(
     val long: Double,
     val friends: HashMap<Int, String>,
     val username: String,
-    val junction_name: String
+    val junction_name: String,
 )
 
 data class NotificationData (
