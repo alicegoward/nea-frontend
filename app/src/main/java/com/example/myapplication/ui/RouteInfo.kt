@@ -10,9 +10,21 @@ import com.example.myapplication.TestViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.Route
@@ -58,11 +70,81 @@ fun RouteInfo(route: RouteInfo, viewModel: TestViewModel, navController: NavCont
                 )
             }
         }
+        Button(
+            content = { Text("Configure individual notification / meet on route behaviour") },
+            onClick = { navController.navigate("notification_config/${route.name}") }
+        )
         Spacer(Modifier.weight(1f))
         Button(
             content= { Text("go back") },
             onClick = { navController.navigate("routeManagerScreen") }
         )
+    }
+}
+
+class Choice(val question: String, val options: List<String>, val initial_state: String) {
+    lateinit var selected: MutableState<String>
+    @Composable
+    fun init() { selected = remember { mutableStateOf(initial_state) } }
+
+    @Composable
+    fun display() {
+        Text(question)
+        options.forEach { text ->
+            Row(
+                Modifier.fillMaxWidth().selectable(selected = (text == selected.value), onClick = { selected.value = text }, role = Role.RadioButton).padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(selected = (text == selected.value), onClick = null)
+                Text(text)
+            }
+        }
+    }
+}
+
+@Composable
+fun IndividualConfig(viewModel: TestViewModel, route_name: String, navController: NavController) {
+    Column(
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(60.dp)) {
+        val create_meet_on_route = Choice(
+            "Auto create meet on route?",
+            listOf("Yes","No"),
+            "No"
+        ).apply { init() }
+        val meet_on_route_tolerance = Choice(
+            "Maximum detour + wait time for meet on route:",
+            listOf(1, 2, 5, 10).map {i -> "$i minutes"},
+            "10 minutes"
+        ).apply { init() }
+        val reroute_tolerance = Choice(
+            "How many metres before rerouting if you go off course?",
+            listOf(20, 50, 100, 200).map {i -> "$i m"},
+            "50 m"
+        ).apply { init() }
+
+        create_meet_on_route.display()
+        if (create_meet_on_route.selected.value == "Yes") {
+            meet_on_route_tolerance.display()
+        }
+        reroute_tolerance.display()
+
+        Text("... insert other things when I think of them")
+        Spacer(Modifier.weight(1F))
+        Row {
+            Button(
+                content = { Text("save and go back") },
+                onClick = {
+                    //viewModel.saveBehaviour(options)
+                    navController.navigate("route_info/$route_name")
+                }
+            )
+            Button(
+                content = { Text("cancel") },
+                onClick = { navController.navigate("route_info/$route_name") }
+            )
+        }
     }
 }
 

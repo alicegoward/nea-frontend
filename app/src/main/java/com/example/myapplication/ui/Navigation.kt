@@ -65,6 +65,13 @@ fun Navigation(context: Context,
                         navController = navController
                     )
                 }
+                composable("notification_config/{route_name}") { backStackEntry ->
+                    IndividualConfig(
+                        route_name =  backStackEntry.arguments?.getString("route_name")!!,
+                        viewModel = viewModel,
+                        navController = navController
+                    )
+                }
                 composable("edit_time/{route_name}") { backStackEntry ->
                     editTime(
                         route_name =  backStackEntry.arguments?.getString("route_name")!!,
