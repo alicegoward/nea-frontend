@@ -39,6 +39,9 @@ interface SampleAPI {
 
     @POST("route/get_individual_config")
     suspend fun getIndividualConfig(@Body userOnRoute: UserOnRoute): Response<ConfigData>
+
+    @POST("route/set_individual_config")
+    suspend fun setIndividualConfig(@Body configData: ConfigData): Response<Success>
 }
 
 data class Track(

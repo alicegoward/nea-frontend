@@ -137,7 +137,10 @@ fun IndividualConfig(viewModel: TestViewModel, route_name: String, navController
             Button(
                 content = { Text("save and go back") },
                 onClick = {
-                    //viewModel.saveBehaviour(options)
+                    route.create_mor = create_meet_on_route.selected.value
+                    route.mor_tolerance_s = meet_on_route_tolerance.selected.value
+                    route.reroute_tolerance_m = reroute_tolerance.selected.value
+                    viewModel.setIndividualConfig(route)
                     navController.navigate("route_info/$route_name")
                 }
             )

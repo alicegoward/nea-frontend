@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.Instant
@@ -259,6 +260,19 @@ class TestViewModel : ViewModel() {
             Log.d("have data", data.toString())
             sampleAPI.updateRoute(data)
             this@TestViewModel.getRoutes()
+        }
+    }
+
+    fun setIndividualConfig(route: RouteInfo) {
+        CoroutineScope(Dispatchers.IO).launch {
+            sampleAPI.setIndividualConfig(ConfigData(
+                user!!,
+                route.name,
+                route.create_mor == "Yes",
+                route.mor_tolerance_s.takeWhile { it.isDigit() }.toDouble() * 60,
+                route.reroute_tolerance_m.takeWhile { it.isDigit() }.toDouble()
+            ))
+            getIndividualConfig(route)
         }
     }
 }
