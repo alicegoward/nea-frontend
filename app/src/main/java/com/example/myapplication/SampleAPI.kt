@@ -48,7 +48,19 @@ data class Track(
     val geometry: HashMap<Int, Coordinate>,
     val dist: Double,
     val other_paths: HashMap<String, HashMap<Int, Coordinate>>,
-    val waypoints: HashMap<Int, Coordinate>
+    val waypoints: HashMap<Int, Coordinate>,
+    val itineraries: HashMap<Int, Itinerary>
+)
+
+data class Itinerary(
+    val username: String,
+    val eta: Float,
+    val waypoints: HashMap<Int, ItineraryWaypoint>
+)
+
+data class ItineraryWaypoint(
+    val participants: HashMap<Int, String>,
+    val eta: Float
 )
 
 data class UserOnRoute (

@@ -4,12 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Looper
 import androidx.lifecycle.ViewModel
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -18,7 +15,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.Instant
@@ -106,6 +102,7 @@ class TestViewModel : ViewModel() {
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
     var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
     var route_dist: Double? by mutableStateOf(null)
+    var itineraries: MutableCollection<Itinerary>? by mutableStateOf(null)
 
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
@@ -126,9 +123,10 @@ class TestViewModel : ViewModel() {
                             route_data.other_paths.forEach { (user, path) ->
                                 other_routes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             }
-                            Log.d("other routes", other_routes.toString())
-                            waypoints = route_data.waypoints.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
+                            Log.d("stuff", route_data.toString())
+                            waypoints = route_data.waypoints.values.toList().map { GeoPoint(it.lat, it.long) }
                             route_dist = route_data.dist
+                            itineraries = route_data.itineraries.values.toMutableList()
                         }
                     }
                 }
@@ -240,12 +238,14 @@ class TestViewModel : ViewModel() {
             waypoints = route_data.waypoints.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
             Log.d("other routes", other_routes.toString())
             route_dist = route_data.dist
+            itineraries = route_data.itineraries.values.toMutableList()
         }
     }
 
     fun activateRoute(route: RouteInfo) {
         if (route == activeRoute) {
             activeRoute = null
+            itineraries = null
             sampleRoute = emptyList()
             CoroutineScope(Dispatchers.IO).launch {
                 sampleAPI.deactivateRoute(user!!)
