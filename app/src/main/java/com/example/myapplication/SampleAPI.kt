@@ -42,6 +42,9 @@ interface SampleAPI {
 
     @POST("route/set_individual_config")
     suspend fun setIndividualConfig(@Body configData: ConfigData): Response<Success>
+
+    @POST("route/notify_others")
+    suspend fun notifyOthers(@Body data_to_notify: Data_to_notify): Response<Success>
 }
 
 data class Track(
@@ -50,6 +53,12 @@ data class Track(
     val other_paths: HashMap<String, HashMap<Int, Coordinate>>,
     val waypoints: HashMap<Int, Coordinate>,
     val itineraries: HashMap<Int, Itinerary>
+)
+
+data class Data_to_notify(
+    val data: String,
+    val route: String,
+    val user: String
 )
 
 data class Itinerary(

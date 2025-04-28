@@ -119,6 +119,17 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                         }
                     }
                 }
+                Row {
+                    Button(
+                        content = { Text("Notify late") },
+                        onClick = { viewModel.sendOthersNotification("late") }
+                    )
+                    Spacer(Modifier.weight(1F))
+                    Button(
+                        content = { Text("Notify lost") },
+                        onClick = { viewModel.sendOthersNotification("lost") }
+                    )
+                }
             }
         }
         Spacer(Modifier.weight(1F))

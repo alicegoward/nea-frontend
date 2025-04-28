@@ -275,4 +275,14 @@ class TestViewModel : ViewModel() {
             getIndividualConfig(route)
         }
     }
+
+    fun sendOthersNotification(meaning: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (meaning == "late") {
+                sampleAPI.notifyOthers(Data_to_notify("$user is running late", activeRoute!!.name, user!!))
+            } else {
+                sampleAPI.notifyOthers(Data_to_notify("$user is lost", activeRoute!!.name, user!!))
+            }
+        }
+    }
 }
