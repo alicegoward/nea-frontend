@@ -77,6 +77,7 @@ class RouteInfo(routeData: RouteData) {
     var create_mor by mutableStateOf("No")
     var mor_tolerance_s by mutableStateOf("10 minutes")
     var reroute_tolerance_m by mutableStateOf("50 m")
+    var auto_notify_late by mutableStateOf("10 minutes")
 }
 
 class TestViewModel : ViewModel() {
@@ -167,6 +168,7 @@ class TestViewModel : ViewModel() {
             route.create_mor = if (config!!.create_mor) "Yes" else "No"
             route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
             route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
+            route.auto_notify_late = "${(config.auto_notify_late/60).toInt()} minutes"
         }
     }
 
@@ -270,8 +272,10 @@ class TestViewModel : ViewModel() {
                 route.name,
                 route.create_mor == "Yes",
                 route.mor_tolerance_s.takeWhile { it.isDigit() }.toDouble() * 60,
-                route.reroute_tolerance_m.takeWhile { it.isDigit() }.toDouble()
-            ))
+                route.reroute_tolerance_m.takeWhile { it.isDigit() }.toDouble(),
+                        route.auto_notify_late.takeWhile { it.isDigit() }.toDouble() * 60,
+
+                ))
             getIndividualConfig(route)
         }
     }

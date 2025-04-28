@@ -124,12 +124,18 @@ fun IndividualConfig(viewModel: TestViewModel, route_name: String, navController
             listOf(20, 50, 100, 200).map {i -> "$i m"},
             route.reroute_tolerance_m
         ).apply { init() }
+        val auto_notify_late = Choice(
+            "After you are late by how much should everyone else be notified?",
+            listOf(2, 5, 10, 20).map {i -> "$i minutes"},
+            route.auto_notify_late
+        ).apply { init() }
 
         create_meet_on_route.display()
         if (create_meet_on_route.selected.value == "Yes") {
             meet_on_route_tolerance.display()
         }
         reroute_tolerance.display()
+        auto_notify_late.display()
 
         Text("... insert other things when I think of them")
         Spacer(Modifier.weight(1F))

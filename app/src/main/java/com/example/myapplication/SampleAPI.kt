@@ -82,7 +82,8 @@ data class ConfigData(
     val route: String,
     val create_mor: Boolean,
     val mor_tolerance_s: Double,
-    val reroute_tolerance_m: Double
+    val reroute_tolerance_m: Double,
+    val auto_notify_late: Double
 )
 
 data class Coordinate(
