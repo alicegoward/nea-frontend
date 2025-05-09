@@ -32,8 +32,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.RouteState
-import com.example.myapplication.TestViewModel
+import com.example.myapplication.MainViewModel
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -45,7 +44,7 @@ import java.util.Calendar
 
 
 @Composable
-fun CreateRoute(viewModel: TestViewModel, context: Context, navController: NavController) {
+fun CreateRoute(viewModel: MainViewModel, context: Context, navController: NavController) {
     Column(Modifier.padding(60.dp)) {
         when (viewModel.routeCreation.state) {
             RouteState.START -> start(viewModel)
@@ -69,7 +68,7 @@ fun CreateRoute(viewModel: TestViewModel, context: Context, navController: NavCo
 }
 
 @Composable
-fun start(viewModel: TestViewModel) {
+fun start(viewModel: MainViewModel) {
     Text("Route name")
     TextField(
         value = viewModel.routeCreation.name,
@@ -77,7 +76,7 @@ fun start(viewModel: TestViewModel) {
     )
 }
 
-fun end(viewModel: TestViewModel, navController: NavController) {
+fun end(viewModel: MainViewModel, navController: NavController) {
     viewModel.routeCreation.state = RouteState.START
     viewModel.saveRoute()
     navController.navigate("routeManagerScreen")
@@ -85,7 +84,7 @@ fun end(viewModel: TestViewModel, navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun chooseEndTime(viewModel: TestViewModel) {
+fun chooseEndTime(viewModel: MainViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
@@ -145,7 +144,7 @@ fun chooseEndTime(viewModel: TestViewModel) {
 }
 
 @Composable
-fun chooseLocation(viewModel: TestViewModel, context: Context) {
+fun chooseLocation(viewModel: MainViewModel, context: Context) {
     lateinit var mapView: MapView
     AndroidView(
         modifier = Modifier
@@ -215,27 +214,27 @@ fun chooseLocation(viewModel: TestViewModel, context: Context) {
 }
 
 @Composable
-fun chooseFriends(viewModel: TestViewModel) {
-    if (viewModel.friends != null) {
+fun chooseFriends(MainViewModel: MainViewModel) {
+    if (MainViewModel.friends != null) {
         Text("Select friends")
-        for (friend: String in viewModel.friends!!) {
+        for (friend: String in MainViewModel.friends!!) {
             Row {
                 Text(friend)
                 Spacer(modifier = Modifier.weight(1F))
-                if (friend in viewModel.routeCreation.friends) {
+                if (friend in MainViewModel.routeCreation.friends) {
                     Button(
-                        onClick = { viewModel.routeCreation.friends.remove(friend) },
+                        onClick = { MainViewModel.routeCreation.friends.remove(friend) },
                         content = { Text("Remove") }
                     )
                 } else {
                     Button(
-                        onClick = { viewModel.routeCreation.friends.add(friend) },
+                        onClick = { MainViewModel.routeCreation.friends.add(friend) },
                         content = { Text("Add") }
                     )
                 }
             }
         }
     } else {
-        viewModel.getFriends()
+        MainViewModel.getFriends()
     }
 }

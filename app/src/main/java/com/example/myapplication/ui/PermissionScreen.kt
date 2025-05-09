@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.TestViewModel
+import com.example.myapplication.MainViewModel
 import com.example.myapplication.checkPermissions
 
 @Composable
 fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
-                     viewModel: TestViewModel,
+                     viewModel: MainViewModel,
                      context: Context,
                      gotoLogin: () -> Unit) {
     checkPermissions(true, singlePermission, multiplePermission, context, viewModel)

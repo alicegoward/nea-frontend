@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
     private lateinit var singlePermission: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewModel : TestViewModel by viewModels()
+        val viewModel : MainViewModel by viewModels()
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             checkPermissions(true, singlePermission, multiplePermission, this, viewModel)

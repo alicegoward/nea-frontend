@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.myapplication.RetrofitHelper.getData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class NotificationService : Service() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         val userDao = AppDatabase.getInstance(this).UserDao()
         var user: String? = null
-        CoroutineScope(Dispatchers.IO).launch {
+        getData {
             while (true) {
                 if (user == null) {
                     val usernames = userDao.getUsername()
@@ -39,9 +40,9 @@ class NotificationService : Service() {
                 }
                 Log.d("maybe notification",user.toString())
                 if (user != null) {
-                    val sampleAPI: SampleAPI =
-                        RetrofitHelper.getInstance().create(SampleAPI::class.java)
-                    val data = sampleAPI.getNotificationData(user!!).body()?.notifications
+                    val mainAPI: MainAPI =
+                        RetrofitHelper.getInstance().create(MainAPI::class.java)
+                    val data = mainAPI.getNotificationData(user!!).body()?.notifications
                     data?.forEach { entry ->
                         Log.d("notification", entry.value)
                         notificationManager.notify(

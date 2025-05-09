@@ -12,25 +12,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Entity
-data class Location(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "timestamp") val timestamp: Long,
-    @ColumnInfo(name = "lat") val lat: Double,
-    @ColumnInfo(name = "long") val long: Double
-)
-
-@Entity
 data class User(
     @PrimaryKey val username: String
 )
-
-@Dao
-interface LocationDao {
-    @Query("SELECT * FROM location")
-    suspend fun getAll(): List<Location>
-    @Insert
-    suspend fun insertLocation(location: Location)
-}
 
 @Dao
 interface UserDao {
@@ -41,9 +25,8 @@ interface UserDao {
     suspend fun insertUser(user: User)
 }
 
-@Database(entities = [Location::class, User::class], version = 6)
+@Database(entities = [User::class], version = 7)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun LocationDao(): LocationDao
     abstract fun UserDao(): UserDao
     companion object {
         private var INSTANCE: AppDatabase? = null

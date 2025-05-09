@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import Route
+import RouteInfo
 import android.annotation.SuppressLint
 import android.os.Looper
 import androidx.lifecycle.ViewModel
@@ -8,79 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.myapplication.RetrofitHelper.getData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-enum class RouteState {
-    START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END;
-    fun next(): RouteState {
-        return when (this) {
-            START -> CHOOSE_FRIENDS
-            CHOOSE_FRIENDS -> CHOOSE_LOCATION
-            CHOOSE_LOCATION -> CHOOSE_END_TIME
-            CHOOSE_END_TIME -> END
-            END -> END
-        }
-    }
-    fun prev(): RouteState {
-        return when (this) {
-            START -> START
-            CHOOSE_FRIENDS -> START
-            CHOOSE_LOCATION -> CHOOSE_FRIENDS
-            CHOOSE_END_TIME -> CHOOSE_LOCATION
-            END -> CHOOSE_END_TIME
-        }
-    }
-}
-
-class Route(EndLocation: GeoPoint) {
-    var state by mutableStateOf(RouteState.START)
-    var friends = mutableStateListOf<String>()
-    var endLocation by mutableStateOf(EndLocation)
-    var endDate: Long? = null
-    var endTime: Int? = null
-    var name by mutableStateOf("")
-
-    fun toRouteModel(username: String): RouteData {
-        val friendDict = HashMap<Int, String>()
-        friends.forEachIndexed {idx, item -> friendDict[idx] = item}
-        return RouteData(
-            endTime = endDate!! + endTime!!,
-            lat = endLocation.latitude,
-            long = endLocation.longitude,
-            friends = friendDict,
-            username = username,
-            name = name,
-            junction_name = "",
-        )
-    }
-}
-
-class RouteInfo(routeData: RouteData) {
-    val name = routeData.name
-    val end_lat = routeData.lat
-    val end_long = routeData.long
-    val admin = routeData.username
-    val participants = routeData.friends
-    val end_time = routeData.endTime
-    val junction_name = routeData.junction_name
-    var create_mor by mutableStateOf("No")
-    var mor_tolerance_s by mutableStateOf("10 minutes")
-    var reroute_tolerance_m by mutableStateOf("50 m")
-    var auto_notify_late by mutableStateOf("10 minutes")
-}
-
-class TestViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
     var other_routes by mutableStateOf(HashMap<String, List<GeoPoint>>())
     var waypoints: List<GeoPoint> by mutableStateOf(emptyList())
     var activeRoute: RouteInfo? by mutableStateOf(null)
@@ -90,7 +31,7 @@ class TestViewModel : ViewModel() {
     var permissionsDone by mutableStateOf(false)
     var buttonText by mutableStateOf("")
     var running: Boolean by mutableStateOf(false)
-    val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+    val mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     var data by mutableStateOf("help")
     var create_account by mutableStateOf(false)
     var user: String? by mutableStateOf(null)
@@ -111,8 +52,8 @@ class TestViewModel : ViewModel() {
             override fun onLocationResult(p0: LocationResult) {
                 val location = p0.locations[p0.locations.size-1]
                 if (activeRoute != null) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val route_data = sampleAPI.postData(
+                    getData {
+                        val route_data = mainAPI.postData(
                             LocationData(
                                 Instant.now().epochSecond,
                                 user!!,
@@ -141,8 +82,8 @@ class TestViewModel : ViewModel() {
     }
 
     fun createUser(to_check: String, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val status = sampleAPI.postUserData(UsernamePassword(to_check, password)).body()
+        getData {
+            val status = mainAPI.postUserData(UsernamePassword(to_check, password)).body()
             Log.d("user create status", status.toString())
             if (status?.success == true) {
                 user = to_check
@@ -154,17 +95,17 @@ class TestViewModel : ViewModel() {
     }
 
     fun saveRoute() {
-        CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.postRoute(routeCreation.toRouteModel(user!!))
+        getData {
+            mainAPI.postRoute(routeCreation.toRouteModel(user!!))
             Log.d("route","saved")
-            routeCreation = Route(this@TestViewModel.position)
+            routeCreation = Route(this@MainViewModel.position)
             getRoutes()
         }
     }
 
     fun getIndividualConfig(route: RouteInfo) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val config = sampleAPI.getIndividualConfig(UserOnRoute(user!!, route.name)).body()
+        getData {
+            val config = mainAPI.getIndividualConfig(UserOnRoute(user!!, route.name)).body()
             route.create_mor = if (config!!.create_mor) "Yes" else "No"
             route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
             route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
@@ -173,15 +114,15 @@ class TestViewModel : ViewModel() {
     }
 
     fun getRoutes() {
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("route?", sampleAPI.getRoutes(user!!).body().toString())
-            routes = sampleAPI.getRoutes(user!!).body()!!.data.map {i -> RouteInfo(i.value) }
+        getData {
+            Log.d("route?", mainAPI.getRoutes(user!!).body().toString())
+            routes = mainAPI.getRoutes(user!!).body()!!.data.map { i -> RouteInfo(i.value) }
         }
     }
 
     fun loginUser(to_check: String, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val user_data = sampleAPI.loginUser(UsernamePassword(to_check, password)).body()
+        getData {
+            val user_data = mainAPI.loginUser(UsernamePassword(to_check, password)).body()
             Log.d("data", user_data.toString())
             if (user_data?.success == true) {
                 user = to_check
@@ -193,9 +134,9 @@ class TestViewModel : ViewModel() {
     }
 
     fun getFriends() {
-        CoroutineScope(Dispatchers.IO).launch {
+        getData {
             if (user != null) {
-                val data = sampleAPI.getFriends(user!!).body()
+                val data = mainAPI.getFriends(user!!).body()
                 Log.d("maybe some data", data.toString())
                 friends = data?.names?.values
                 pending_requests = data?.incoming?.values
@@ -206,16 +147,16 @@ class TestViewModel : ViewModel() {
 
 
     fun update_request(request: String, state: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.updateRequest(UpdateRequest(user!!, request, state))
-            this@TestViewModel.getFriends()
+        getData {
+            mainAPI.updateRequest(UpdateRequest(user!!, request, state))
+            this@MainViewModel.getFriends()
         }
     }
 
 
     fun addFriend(to_add: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            error_add_friend = sampleAPI.addFriend(
+        getData {
+            error_add_friend = mainAPI.addFriend(
                 AddFriend(
                     userRequesting = user!!,
                     userRequested = to_add
@@ -226,8 +167,8 @@ class TestViewModel : ViewModel() {
     }
 
     fun getSampleData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val route_data = sampleAPI.getSampleData(Routing(
+        getData {
+            val route_data = mainAPI.getSampleData(Routing(
                 position = Coordinate(position.latitude, position.longitude),
                 user = user!!,
                 datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
@@ -249,8 +190,8 @@ class TestViewModel : ViewModel() {
             activeRoute = null
             itineraries = null
             sampleRoute = emptyList()
-            CoroutineScope(Dispatchers.IO).launch {
-                sampleAPI.deactivateRoute(user!!)
+            getData {
+                mainAPI.deactivateRoute(user!!)
             }
         } else {
             activeRoute = route
@@ -258,16 +199,16 @@ class TestViewModel : ViewModel() {
         }
     }
     fun updateRouteInfo(data: Map<String, String>) {
-        CoroutineScope(Dispatchers.IO).launch {
+        getData {
             Log.d("have data", data.toString())
-            sampleAPI.updateRoute(data)
-            this@TestViewModel.getRoutes()
+            mainAPI.updateRoute(data)
+            this@MainViewModel.getRoutes()
         }
     }
 
     fun setIndividualConfig(route: RouteInfo) {
-        CoroutineScope(Dispatchers.IO).launch {
-            sampleAPI.setIndividualConfig(ConfigData(
+        getData {
+            mainAPI.setIndividualConfig(ConfigData(
                 user!!,
                 route.name,
                 route.create_mor == "Yes",
@@ -281,11 +222,11 @@ class TestViewModel : ViewModel() {
     }
 
     fun sendOthersNotification(meaning: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        getData {
             if (meaning == "late") {
-                sampleAPI.notifyOthers(Data_to_notify("$user is running late", activeRoute!!.name, user!!))
+                mainAPI.notifyOthers(DataToNotify("$user is running late", activeRoute!!.name, user!!))
             } else {
-                sampleAPI.notifyOthers(Data_to_notify("$user is lost", activeRoute!!.name, user!!))
+                mainAPI.notifyOthers(DataToNotify("$user is lost", activeRoute!!.name, user!!))
             }
         }
     }

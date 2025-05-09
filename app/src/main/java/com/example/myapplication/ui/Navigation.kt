@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import RouteInfo
 import android.content.Context
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
@@ -8,14 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.RouteInfo
-import com.example.myapplication.TestViewModel
+import com.example.myapplication.MainViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 
 @Composable
 fun Navigation(context: Context,
-               viewModel: TestViewModel,
+               viewModel: MainViewModel,
                singlePermission: ActivityResultLauncher<String>,
                multiplePermission: ActivityResultLauncher<Array<String>>
 ) {
@@ -34,9 +34,6 @@ fun Navigation(context: Context,
                         gotoLogin = {navController.navigate(("loginScreen"))},
                     )
                 }
-                composable("displayLocation") {
-                    DisplayLocation(viewModel, context)
-                }
                 composable("loginScreen") {
                     LoginScreen(viewModel,
                         context,
@@ -46,15 +43,13 @@ fun Navigation(context: Context,
                     OsmdroidMapView(
                         viewModel = viewModel,
                         context = context,
-                        gotoFriends = {navController.navigate(("friendScreen"))},
-                        gotoRoute = { navController.navigate(("routeManagerScreen")) })
+                        navController = navController
+                    )
                 }
                 composable("friendScreen") {
                     FriendScreen(
                         viewModel = viewModel,
-                        context = context,
-                        gotoMap = {navController.navigate(("mapScreen")) },
-                        gotoRoute = {navController.navigate(("routeManagerScreen"))}
+                        navController = navController
                     )
                 }
                 composable("routeManagerScreen") {
@@ -84,7 +79,7 @@ fun Navigation(context: Context,
                 composable("edit_position/{route_name}") { backStackEntry ->
                     editPosition(
                         route_name =  backStackEntry.arguments?.getString("route_name")!!,
-                        viewModel = viewModel,
+                        MainViewModel = viewModel,
                         navController = navController,
                         context = context
                     )

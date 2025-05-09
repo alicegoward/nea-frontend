@@ -16,7 +16,7 @@ fun checkPermissions(clicked : Boolean,
                      singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
                      context: Context,
-                     viewModel: TestViewModel) {
+                     viewModel: MainViewModel) {
     if (!checkPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
         viewModel.buttonText = "Notification permission"
         if( clicked ) {

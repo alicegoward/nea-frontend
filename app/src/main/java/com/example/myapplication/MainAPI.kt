@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface SampleAPI {
+interface MainAPI {
     @POST("user/login")
     suspend fun loginUser(@Body userDataModel: UsernamePassword): Response<UserInfo>
     @POST("user/add")
@@ -44,7 +44,7 @@ interface SampleAPI {
     suspend fun setIndividualConfig(@Body configData: ConfigData): Response<Success>
 
     @POST("route/notify_others")
-    suspend fun notifyOthers(@Body data_to_notify: Data_to_notify): Response<Success>
+    suspend fun notifyOthers(@Body dataToNotify: DataToNotify): Response<Success>
 }
 
 data class Track(
@@ -55,7 +55,7 @@ data class Track(
     val itineraries: HashMap<Int, Itinerary>
 )
 
-data class Data_to_notify(
+data class DataToNotify(
     val data: String,
     val route: String,
     val user: String

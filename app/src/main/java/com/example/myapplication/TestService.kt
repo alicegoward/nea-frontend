@@ -13,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import com.example.myapplication.RetrofitHelper.getData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
@@ -26,7 +27,7 @@ import java.time.Instant
 
 class TestService: Service() {
     private lateinit var locationCallback: LocationCallback
-    val sampleAPI: SampleAPI = RetrofitHelper.getInstance().create(SampleAPI::class.java)
+    val mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d("help","here")
@@ -58,8 +59,8 @@ class TestService: Service() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
-                    CoroutineScope(Dispatchers.IO).launch {
-                        sampleAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], Coordinate(location.latitude, location.longitude))).body().toString()
+                    getData {
+                        mainAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], Coordinate(location.latitude, location.longitude))).body().toString()
                         Log.d("logging location", "done")
                     }
                 }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -23,7 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.example.myapplication.TestViewModel
+import androidx.navigation.NavController
+import com.example.myapplication.MainViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -37,7 +37,7 @@ import java.util.Locale
 
 
 @Composable
-fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()->Unit, gotoRoute: () -> Unit) {
+fun OsmdroidMapView(viewModel: MainViewModel, context: Context, navController: NavController) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     viewModel.getLocation(fusedLocationProviderClient)
     AndroidView(
@@ -97,9 +97,7 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
             }
         }
     )
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    outerScaffold (navController) {
         if (viewModel.itineraries != null) {
             Column(Modifier.fillMaxWidth().background(Color.Gray).padding(60.dp)) {
                 for (itinerary in viewModel.itineraries!!) {
@@ -131,17 +129,6 @@ fun OsmdroidMapView(viewModel: TestViewModel, context: Context, gotoFriends: ()-
                     )
                 }
             }
-        }
-        Spacer(Modifier.weight(1F))
-        Row(Modifier.padding(60.dp)) {
-            Button(
-                onClick = { gotoFriends() },
-                content = { Text("Friends") }
-            )
-            Button(
-                onClick = { gotoRoute() },
-                content = { Text("Route") }
-            )
         }
     }
 }
