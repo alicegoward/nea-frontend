@@ -7,7 +7,6 @@ import android.os.Looper
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.myapplication.RetrofitHelper.getData
@@ -115,7 +114,6 @@ class MainViewModel : ViewModel() {
 
     fun getRoutes() {
         getData {
-            Log.d("route?", mainAPI.getRoutes(user!!).body().toString())
             routes = mainAPI.getRoutes(user!!).body()!!.data.map { i -> RouteInfo(i.value) }
         }
     }
@@ -166,13 +164,13 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getSampleData() {
+    fun getSampleData(route: RouteInfo) {
         getData {
             val route_data = mainAPI.getSampleData(Routing(
                 position = Coordinate(position.latitude, position.longitude),
                 user = user!!,
                 datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-                route = activeRoute!!.name
+                route = route.name
             )).body()
             sampleRoute = route_data!!.geometry.toSortedMap().values.map {GeoPoint(it.lat, it.long)}
             route_data.other_paths.forEach { (user, path) ->
@@ -182,6 +180,7 @@ class MainViewModel : ViewModel() {
             Log.d("other routes", other_routes.toString())
             route_dist = route_data.dist
             itineraries = route_data.itineraries.values.toMutableList()
+            activeRoute = route
         }
     }
 
@@ -194,8 +193,8 @@ class MainViewModel : ViewModel() {
                 mainAPI.deactivateRoute(user!!)
             }
         } else {
-            activeRoute = route
-            getSampleData()
+            Log.d("activating route","here")
+            getSampleData(route)
         }
     }
     fun updateRouteInfo(data: Map<String, String>) {
