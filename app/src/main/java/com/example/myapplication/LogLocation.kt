@@ -20,12 +20,9 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.time.Instant
 
-class TestService: Service() {
+class LogLocation: Service() {
     private lateinit var locationCallback: LocationCallback
     val mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     @SuppressLint("MissingPermission")
@@ -60,7 +57,7 @@ class TestService: Service() {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
                     getData {
-                        mainAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUsername()[0], Coordinate(location.latitude, location.longitude))).body().toString()
+                        mainAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUserPass()[0].username, Coordinate(location.latitude, location.longitude))).body().toString()
                         Log.d("logging location", "done")
                     }
                 }

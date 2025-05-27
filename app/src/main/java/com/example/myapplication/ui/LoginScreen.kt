@@ -31,18 +31,17 @@ fun LoginScreen(viewModel: MainViewModel, context: Context, gotoMain: ()->Unit) 
     val userDao = db.UserDao()
 
     CoroutineScope(Dispatchers.IO).launch {
-        Log.d("user logged in", userDao.getUsername().toString())
-        if (userDao.getUsername().size == 1) {
-            viewModel.user = userDao.getUsername()[0]
+        val credentials = userDao.getUserPass()
+        if (credentials.size == 1) {
+            viewModel.loginUser(credentials[0].username, credentials[0].password)
         }
     }
 
     if (viewModel.user != null) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (userDao.getUsername().isEmpty()) {
-                Log.d("user currently", userDao.getUsername().toString())
-                userDao.insertUser(User(username = viewModel.user!!))
-            }
+            userDao.deleteUser()
+            Log.d("dao", userDao.getUserPass().toString())
+            userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
         }
         Log.d("user", viewModel.user!!)
         LaunchedEffect(true) { gotoMain() }

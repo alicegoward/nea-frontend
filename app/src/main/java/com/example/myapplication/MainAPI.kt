@@ -15,12 +15,12 @@ interface MainAPI {
     suspend fun addFriend(@Body addFriendModel: AddFriend): Response<Success>
     @POST("user/update_friend_state")
     suspend fun updateRequest(@Body updateRequestModel: UpdateRequest): Response<Success>
-    @GET("user/notifications/{id}")
-    suspend fun getNotificationData(@Path("id") id: String): Response<NotificationData>
-    @GET("user/friends/{id}")
-    suspend fun getFriends(@Path("id") id: String): Response<Friends>
-    @GET("get_route/{id}")
-    suspend fun getRoutes(@Path("id") id: String): Response<RouteDataList>
+    @GET("user/notifications")
+    suspend fun getNotificationData(): Response<NotificationData>
+    @GET("user/friends")
+    suspend fun getFriends(): Response<Friends>
+    @GET("get_route")
+    suspend fun getRoutes(): Response<RouteDataList>
 
     @POST("add_location")
     suspend fun postData(@Body locationDataModel: LocationData): Response<Track>
@@ -31,8 +31,8 @@ interface MainAPI {
     @POST("route/sample")
     suspend fun getSampleData(@Body startEnd: Routing): Response<Track>
 
-    @POST("route/deactivate/{id}")
-    suspend fun deactivateRoute(@Path("id") id: String): Response<Success>
+    @POST("route/deactivate")
+    suspend fun deactivateRoute(): Response<Success>
 
     @POST("route/update")
     suspend fun updateRoute(@Body updateRoute: Map<String, String>): Response<Success>
@@ -119,8 +119,7 @@ data class NotificationData (
 )
 
 data class UserInfo (
-    val username: String,
-    val password: String,
+    val token: String,
     val success: Boolean,
     val reason: String
 )

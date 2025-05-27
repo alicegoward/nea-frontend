@@ -9,7 +9,9 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.myapplication.RetrofitHelper.createClient
 import com.example.myapplication.RetrofitHelper.getData
+import com.example.myapplication.RetrofitHelper.okHttpClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -29,16 +31,14 @@ class MainViewModel : ViewModel() {
     var pending_requests: MutableCollection<String>? by mutableStateOf(null)
     var permissionsDone by mutableStateOf(false)
     var buttonText by mutableStateOf("")
-    var running: Boolean by mutableStateOf(false)
-    val mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
-    var data by mutableStateOf("help")
+    var mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     var create_account by mutableStateOf(false)
     var user: String? by mutableStateOf(null)
+    var password: String? by mutableStateOf(null)
     var error_text: String? by mutableStateOf(null)
     var error_add_friend: String? by mutableStateOf(null)
     var position by mutableStateOf(GeoPoint(0.0, 0.0))
     private lateinit var locationCallback: LocationCallback
-    var locationText by mutableStateOf("unknown location")
     var routeCreation = Route(this.position)
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
     var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
@@ -114,7 +114,7 @@ class MainViewModel : ViewModel() {
 
     fun getRoutes() {
         getData {
-            routes = mainAPI.getRoutes(user!!).body()!!.data.map { i -> RouteInfo(i.value) }
+            routes = mainAPI.getRoutes().body()!!.data.map { i -> RouteInfo(i.value) }
         }
     }
 
@@ -123,7 +123,10 @@ class MainViewModel : ViewModel() {
             val user_data = mainAPI.loginUser(UsernamePassword(to_check, password)).body()
             Log.d("data", user_data.toString())
             if (user_data?.success == true) {
+                okHttpClient = createClient(user_data.token)
+                mainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
                 user = to_check
+                this.password = password
             } else {
                 error_text = user_data?.reason
                 Log.e("login", error_text.toString())
@@ -134,7 +137,7 @@ class MainViewModel : ViewModel() {
     fun getFriends() {
         getData {
             if (user != null) {
-                val data = mainAPI.getFriends(user!!).body()
+                val data = mainAPI.getFriends().body()
                 Log.d("maybe some data", data.toString())
                 friends = data?.names?.values
                 pending_requests = data?.incoming?.values
@@ -190,7 +193,7 @@ class MainViewModel : ViewModel() {
             itineraries = null
             sampleRoute = emptyList()
             getData {
-                mainAPI.deactivateRoute(user!!)
+                mainAPI.deactivateRoute()
             }
         } else {
             Log.d("activating route","here")

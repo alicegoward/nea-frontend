@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.myapplication.TestService
+import com.example.myapplication.LogLocation
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.isServiceRunning
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,7 +27,7 @@ fun RouteManager(viewModel: MainViewModel, context: Context, navController: NavC
         viewModel.getRoutes()
     }
     if ((viewModel.activeRoute != null) and !isServiceRunning(context)) {
-        context.startService(Intent(context, TestService::class.java))
+        context.startService(Intent(context, LogLocation::class.java))
     }
     val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
@@ -49,7 +49,7 @@ fun RouteManager(viewModel: MainViewModel, context: Context, navController: NavC
                         Button(
                             onClick = {
                                 if (viewModel.activeRoute == route) {
-                                    context.stopService(Intent(context, TestService::class.java))
+                                    context.stopService(Intent(context, LogLocation::class.java))
                                 }
                                 viewModel.activateRoute(route)
                             },

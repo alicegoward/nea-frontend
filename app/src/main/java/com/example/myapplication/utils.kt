@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 
@@ -20,7 +21,9 @@ fun checkPermissions(clicked : Boolean,
     if (!checkPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
         viewModel.buttonText = "Notification permission"
         if( clicked ) {
-            singlePermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                singlePermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     } else if (!checkPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
         viewModel.buttonText = "Location permission"
@@ -46,7 +49,7 @@ fun checkPermissions(clicked : Boolean,
 fun isServiceRunning(context: Context): Boolean {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
-        if (TestService::class.java.name == service.service.className) {
+        if (LogLocation::class.java.name == service.service.className) {
             return true
         }
     }

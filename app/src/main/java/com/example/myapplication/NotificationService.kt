@@ -33,16 +33,16 @@ class NotificationService : Service() {
         getData {
             while (true) {
                 if (user == null) {
-                    val usernames = userDao.getUsername()
+                    val usernames = userDao.getUserPass()
                     if (usernames.size == 1) {
-                        user = usernames[0]
+                        user = usernames[0].username
                     }
                 }
                 Log.d("maybe notification",user.toString())
                 if (user != null) {
                     val mainAPI: MainAPI =
                         RetrofitHelper.getInstance().create(MainAPI::class.java)
-                    val data = mainAPI.getNotificationData(user!!).body()?.notifications
+                    val data = mainAPI.getNotificationData().body()?.notifications
                     data?.forEach { entry ->
                         Log.d("notification", entry.value)
                         notificationManager.notify(
