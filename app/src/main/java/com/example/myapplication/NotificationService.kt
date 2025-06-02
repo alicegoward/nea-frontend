@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.myapplication.RetrofitHelper.getData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,26 +29,30 @@ class NotificationService : Service() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         val userDao = AppDatabase.getInstance(this).UserDao()
         var user: String? = null
-        getData {
+        CoroutineScope(Dispatchers.IO).launch {
             while (true) {
-                if (user == null) {
-                    val usernames = userDao.getUserPass()
-                    if (usernames.size == 1) {
-                        user = usernames[0].username
+                try {
+                    if (user == null) {
+                        val usernames = userDao.getUserPass()
+                        if (usernames.size == 1) {
+                            user = usernames[0].username
+                        }
                     }
-                }
-                Log.d("maybe notification",user.toString())
-                if (user != null) {
-                    val mainAPI: MainAPI =
-                        RetrofitHelper.getInstance().create(MainAPI::class.java)
-                    val data = mainAPI.getNotificationData().body()?.notifications
-                    data?.forEach { entry ->
-                        Log.d("notification", entry.value)
-                        notificationManager.notify(
-                            Random.nextInt(0, 1000),
-                            builder.setContentText(entry.value).build()
-                        )
+                    Log.d("maybe notification", user.toString())
+                    if (user != null) {
+                        val mainAPI: MainAPI =
+                            RetrofitHelper.getInstance().create(MainAPI::class.java)
+                        val data = mainAPI.getNotificationData().body()?.notifications
+                        data?.forEach { entry ->
+                            Log.d("notification", entry.value)
+                            notificationManager.notify(
+                                Random.nextInt(0, 1000),
+                                builder.setContentText(entry.value).build()
+                            )
+                        }
                     }
+                } catch(e: Exception) {
+                    Log.d("fail", "notification")
                 }
                 Thread.sleep(30000)
             }

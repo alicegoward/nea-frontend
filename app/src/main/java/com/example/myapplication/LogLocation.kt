@@ -13,13 +13,15 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
-import com.example.myapplication.RetrofitHelper.getData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 class LogLocation: Service() {
@@ -56,9 +58,18 @@ class LogLocation: Service() {
             override fun onLocationResult(p0: LocationResult) {
                 for (location in p0.locations){
                     Log.d("location",location.latitude.toString())
-                    getData {
-                        mainAPI.postData(LocationData(Instant.now().epochSecond, userDao.getUserPass()[0].username, Coordinate(location.latitude, location.longitude))).body().toString()
-                        Log.d("logging location", "done")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            mainAPI.postData(
+                                LocationData(
+                                    Instant.now().epochSecond,
+                                    Coordinate(location.latitude, location.longitude)
+                                )
+                            ).body().toString()
+                            Log.d("logging location", "done")
+                        } catch (e: Exception) {
+                            Log.d("logging location","failed")
+                        }
                     }
                 }
             }

@@ -1,12 +1,17 @@
 package com.example.myapplication
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.SocketTimeoutException
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 
@@ -36,15 +41,5 @@ object RetrofitHelper {
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
-    }
-
-    fun getData(doStuff: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                doStuff()
-            } catch (e: Exception) {
-                Log.e("internet", e.toString())
-            }
-        }
     }
 }

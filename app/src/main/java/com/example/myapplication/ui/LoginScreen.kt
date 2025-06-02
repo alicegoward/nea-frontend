@@ -46,6 +46,7 @@ fun LoginScreen(viewModel: MainViewModel, context: Context, gotoMain: ()->Unit) 
         Log.d("user", viewModel.user!!)
         LaunchedEffect(true) { gotoMain() }
     }
+    displaySnackbar(viewModel)
     Row(modifier = Modifier.padding(top=60.dp, start=30.dp)) {
         Button(
             onClick = { viewModel.create_account = false }

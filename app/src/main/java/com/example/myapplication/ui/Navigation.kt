@@ -66,20 +66,22 @@ fun Navigation(context: Context,
                     IndividualConfig(
                         route_name =  route_name,
                         viewModel = viewModel,
-                        navController = navController
+                        navController = navController,
+                        context = context
                     )
                 }
                 composable("edit_time/{route_name}") { backStackEntry ->
                     editTime(
                         route_name =  backStackEntry.arguments?.getString("route_name")!!,
                         viewModel = viewModel,
-                        navController = navController
+                        navController = navController,
+                        context = context
                     )
                 }
                 composable("edit_position/{route_name}") { backStackEntry ->
                     editPosition(
                         route_name =  backStackEntry.arguments?.getString("route_name")!!,
-                        MainViewModel = viewModel,
+                        viewModel = viewModel,
                         navController = navController,
                         context = context
                     )
@@ -88,7 +90,8 @@ fun Navigation(context: Context,
                     editParticipants(
                         route_name =  backStackEntry.arguments?.getString("route_name")!!,
                         viewModel = viewModel,
-                        navController = navController
+                        navController = navController,
+                        context = context
                     )
                 }
                 composable("route_info/{route_name}") { backStackEntry ->
@@ -102,7 +105,8 @@ fun Navigation(context: Context,
                     RouteInfo(
                         route = routeInfo!!,
                         viewModel = viewModel,
-                        navController = navController
+                        navController = navController,
+                        context = context
                     )
                 }
                 composable("create_route") {

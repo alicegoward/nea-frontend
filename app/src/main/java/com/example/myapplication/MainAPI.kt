@@ -61,9 +61,9 @@ data class DataToNotify(
 )
 
 data class Itinerary(
-    val username: String,
     val eta: Float,
-    val waypoints: HashMap<Int, ItineraryWaypoint>
+    val waypoints: HashMap<Int, ItineraryWaypoint>,
+    val username: String
 )
 
 data class ItineraryWaypoint(
@@ -72,12 +72,10 @@ data class ItineraryWaypoint(
 )
 
 data class UserOnRoute (
-    val user: String,
     val route: String
 )
 
 data class ConfigData(
-    val user: String,
     val route: String,
     val create_mor: Boolean,
     val mor_tolerance_s: Double,
@@ -92,7 +90,6 @@ data class Coordinate(
 
 data class Routing (
     val position: Coordinate,
-    val user: String,
     val datetime: Long,
     val route: String
 )
@@ -104,10 +101,10 @@ data class RouteDataList(
 data class RouteData(
     val endTime: Long,
     val name: String,
+    val username: String,
     val lat: Double,
     val long: Double,
     val friends: HashMap<Int, String>,
-    val username: String,
     val junction_name: String,
 )
 
@@ -122,7 +119,6 @@ data class UserInfo (
 
 data class LocationData (
     val datetime: Long,
-    val user: String,
     val position: Coordinate
 )
 

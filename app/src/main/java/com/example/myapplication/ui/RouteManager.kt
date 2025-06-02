@@ -32,7 +32,7 @@ fun RouteManager(viewModel: MainViewModel, context: Context, navController: NavC
     val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
     viewModel.getLocation(fusedLocationClient)
-    outerScaffold(navController) {
+    outerScaffold(navController, viewModel) {
         Column(
             modifier = Modifier.padding(60.dp).verticalScroll(rememberScrollState())
         ) {

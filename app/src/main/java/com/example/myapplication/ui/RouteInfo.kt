@@ -33,8 +33,8 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun RouteInfo(route: RouteInfo, viewModel: MainViewModel, navController: NavController) {
-    outerScaffold(navController) {
+fun RouteInfo(route: RouteInfo, viewModel: MainViewModel, navController: NavController, context: Context) {
+    outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             Text(route.name, fontSize = 30.sp)
             Text("Route participants:", fontSize = 20.sp)
@@ -108,9 +108,9 @@ class Choice(val question: String, val options: List<String>, val initial_state:
 }
 
 @Composable
-fun IndividualConfig(viewModel: MainViewModel, route_name: String, navController: NavController) {
+fun IndividualConfig(viewModel: MainViewModel, route_name: String, navController: NavController, context: Context) {
     val route = viewModel.routes.find {it.name == route_name}!!
-    outerScaffold(navController) {
+    outerScaffold(navController, viewModel) {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
@@ -164,14 +164,14 @@ fun IndividualConfig(viewModel: MainViewModel, route_name: String, navController
 }
 
 @Composable
-fun editParticipants(route_name: String, viewModel: MainViewModel, navController: NavController) {
+fun editParticipants(route_name: String, viewModel: MainViewModel, navController: NavController, context: Context) {
     var route: RouteInfo? = null
     for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route
     }
     viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
     viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
-    outerScaffold(navController) {
+    outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             chooseFriends(viewModel)
             Spacer(Modifier.weight(1F))
@@ -200,14 +200,14 @@ fun editParticipants(route_name: String, viewModel: MainViewModel, navController
 }
 
 @Composable
-fun editTime(route_name: String, viewModel: MainViewModel, navController: NavController) {
+fun editTime(route_name: String, viewModel: MainViewModel, navController: NavController, context: Context) {
     var route: RouteInfo? = null
     for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route
     }
     viewModel.routeCreation = Route(viewModel.position)
     viewModel.routeCreation.endTime = route!!.end_time.toInt()
-    outerScaffold(navController) {
+    outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             chooseEndTime(viewModel)
             Spacer(Modifier.weight(1F))
@@ -241,24 +241,24 @@ fun editTime(route_name: String, viewModel: MainViewModel, navController: NavCon
 }
 
 @Composable
-fun editPosition(route_name: String, context: Context, MainViewModel: MainViewModel, navController: NavController) {
+fun editPosition(route_name: String, context: Context, viewModel: MainViewModel, navController: NavController) {
     var route: RouteInfo? = null
-    for (possible_route in MainViewModel.routes) {
+    for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route
     }
-    MainViewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
-    outerScaffold(navController) {
+    viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
+    outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
-            chooseLocation(MainViewModel, context)
+            chooseLocation(viewModel, context)
             Spacer(Modifier.weight(1F))
             Row {
                 Button(
                     content = { Text("Save") },
                     onClick = {
-                        MainViewModel.updateRouteInfo(
+                        viewModel.updateRouteInfo(
                             mapOf(
-                                "lat" to MainViewModel.routeCreation.endLocation.latitude.toString(),
-                                "long" to MainViewModel.routeCreation.endLocation.longitude.toString(),
+                                "lat" to viewModel.routeCreation.endLocation.latitude.toString(),
+                                "long" to viewModel.routeCreation.endLocation.longitude.toString(),
                                 "route" to route_name
                             )
                         )

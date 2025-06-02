@@ -45,6 +45,7 @@ import java.util.Calendar
 
 @Composable
 fun CreateRoute(viewModel: MainViewModel, context: Context, navController: NavController) {
+    displaySnackbar(viewModel)
     Column(Modifier.padding(60.dp)) {
         when (viewModel.routeCreation.state) {
             RouteState.START -> start(viewModel)

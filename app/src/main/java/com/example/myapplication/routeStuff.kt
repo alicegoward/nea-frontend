@@ -43,9 +43,9 @@ class Route(EndLocation: GeoPoint) {
             lat = endLocation.latitude,
             long = endLocation.longitude,
             friends = friendDict,
-            username = username,
             name = name,
             junction_name = "",
+            username = username
         )
     }
 }

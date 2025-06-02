@@ -21,10 +21,9 @@ import androidx.navigation.NavController
 import com.example.myapplication.MainViewModel
 
 @Composable
-fun FriendScreen(viewModel: MainViewModel,
-                 navController: NavController) {
+fun FriendScreen(viewModel: MainViewModel, navController: NavController) {
     var current_friend by remember {mutableStateOf("")}
-    outerScaffold(navController) {
+    outerScaffold(navController, viewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

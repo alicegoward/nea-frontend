@@ -10,14 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.myapplication.RetrofitHelper.createClient
-import com.example.myapplication.RetrofitHelper.getData
 import com.example.myapplication.RetrofitHelper.okHttpClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.net.SocketTimeoutException
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -44,6 +47,7 @@ class MainViewModel : ViewModel() {
     var sampleRoute by mutableStateOf(emptyList<GeoPoint>())
     var route_dist: Double? by mutableStateOf(null)
     var itineraries: MutableCollection<Itinerary>? by mutableStateOf(null)
+    var toastText by mutableStateOf("")
 
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
@@ -55,8 +59,7 @@ class MainViewModel : ViewModel() {
                         val route_data = mainAPI.postData(
                             LocationData(
                                 Instant.now().epochSecond,
-                                user!!,
-                                Coordinate(location.latitude, location.longitude)
+                                Coordinate(location.latitude, location.longitude),
                             )
                         ).body()
                         if (route_data != null) {
@@ -104,7 +107,7 @@ class MainViewModel : ViewModel() {
 
     fun getIndividualConfig(route: RouteInfo) {
         getData {
-            val config = mainAPI.getIndividualConfig(UserOnRoute(user!!, route.name)).body()
+            val config = mainAPI.getIndividualConfig(UserOnRoute(user!!)).body()
             route.create_mor = if (config!!.create_mor) "Yes" else "No"
             route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
             route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
@@ -173,7 +176,6 @@ class MainViewModel : ViewModel() {
         getData {
             val route_data = mainAPI.getSampleData(Routing(
                 position = Coordinate(position.latitude, position.longitude),
-                user = user!!,
                 datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 route = route.name
             )).body()
@@ -213,7 +215,6 @@ class MainViewModel : ViewModel() {
     fun setIndividualConfig(route: RouteInfo) {
         getData {
             mainAPI.setIndividualConfig(ConfigData(
-                user!!,
                 route.name,
                 route.create_mor == "Yes",
                 route.mor_tolerance_s.takeWhile { it.isDigit() }.toDouble() * 60,
@@ -232,6 +233,21 @@ class MainViewModel : ViewModel() {
             } else {
                 mainAPI.notifyOthers(DataToNotify("$user is lost", activeRoute!!.name, user!!))
             }
+        }
+    }
+    fun getData(doStuff: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                doStuff()
+                toastText = ""
+            } catch (e: NullPointerException) {
+                toastText = "Server Error"
+            } catch (e: SocketTimeoutException) {
+                toastText = "Network Error"
+            } catch (e: Exception) {
+                toastText = "HELP"
+            }
+            Log.d("toast", toastText)
         }
     }
 }
