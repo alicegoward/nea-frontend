@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitHelper {
 
-    private const val BASE_URL = "http://192.168.137.1:8000/db/"
+    private const val BASE_URL = "http://192.168.137.1:8000/api/"
 
     var okHttpClient: OkHttpClient = createClient("aaaa")
 

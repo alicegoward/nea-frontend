@@ -4,12 +4,11 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
 
 interface MainAPI {
     @POST("user/login")
     suspend fun loginUser(@Body userDataModel: UsernamePassword): Response<UserInfo>
-    @POST("user/add")
+    @POST("user/register")
     suspend fun postUserData(@Body userDataModel: UsernamePassword): Response<Success>
     @POST("user/add_friend")
     suspend fun addFriend(@Body addFriendModel: AddFriend): Response<Success>
@@ -100,7 +99,6 @@ data class Routing (
 
 data class RouteDataList(
     val data: HashMap<Int, RouteData>,
-    val success: Boolean
 )
 
 data class RouteData(
@@ -115,12 +113,10 @@ data class RouteData(
 
 data class NotificationData (
     val notifications: HashMap<Int, String>,
-    val success: Boolean,
 )
 
 data class UserInfo (
     val token: String,
-    val success: Boolean,
     val reason: String
 )
 
@@ -141,12 +137,10 @@ data class AddFriend(
 )
 
 data class Success(
-    val success: Boolean,
     val reason: String
 )
 
 data class Friends(
-    val success: Boolean,
     val names: HashMap<Int, String>,
     val incoming: HashMap<Int, String>,
     val outgoing: HashMap<Int, String>
