@@ -107,7 +107,7 @@ class MainViewModel : ViewModel() {
 
     fun getIndividualConfig(route: RouteInfo) {
         getData {
-            val config = mainAPI.getIndividualConfig(UserOnRoute(user!!)).body()
+            val config = mainAPI.getIndividualConfig(UserOnRoute(route.name)).body()
             route.create_mor = if (config!!.create_mor) "Yes" else "No"
             route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
             route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
@@ -174,7 +174,7 @@ class MainViewModel : ViewModel() {
 
     fun getSampleData(route: RouteInfo) {
         getData {
-            val route_data = mainAPI.getSampleData(Routing(
+            val route_data = mainAPI.activateRoute(Routing(
                 position = Coordinate(position.latitude, position.longitude),
                 datetime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                 route = route.name
@@ -195,7 +195,6 @@ class MainViewModel : ViewModel() {
         if (route == activeRoute) {
             activeRoute = null
             itineraries = null
-            sampleRoute = emptyList()
             getData {
                 mainAPI.deactivateRoute()
             }

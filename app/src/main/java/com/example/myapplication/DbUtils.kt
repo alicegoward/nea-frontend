@@ -11,10 +11,12 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import java.util.UUID
 
 @Entity
 data class User (
-    @PrimaryKey val username: String,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val username: String,
     val password: String
 )
 
@@ -36,7 +38,7 @@ interface UserDao {
     suspend fun insertUser(user: User)
 }
 
-@Database(entities = [User::class], version = 10)
+@Database(entities = [User::class], version = 12)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun UserDao(): UserDao
     companion object {

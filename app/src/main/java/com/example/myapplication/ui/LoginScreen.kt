@@ -32,7 +32,8 @@ fun LoginScreen(viewModel: MainViewModel, context: Context, gotoMain: ()->Unit) 
 
     CoroutineScope(Dispatchers.IO).launch {
         val credentials = userDao.getUserPass()
-        if (credentials.size == 1) {
+        Log.d("CREDENTIALS", credentials.toString())
+        if (credentials.isNotEmpty()) {
             viewModel.loginUser(credentials[0].username, credentials[0].password)
         }
     }

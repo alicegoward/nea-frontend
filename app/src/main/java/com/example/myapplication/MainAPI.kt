@@ -27,8 +27,8 @@ interface MainAPI {
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
 
-    @POST("route/sample")
-    suspend fun getSampleData(@Body startEnd: Routing): Response<Track>
+    @POST("route/activate")
+    suspend fun activateRoute(@Body startEnd: Routing): Response<Track>
 
     @POST("route/deactivate")
     suspend fun deactivateRoute(): Response<Success>
