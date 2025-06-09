@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.MainViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,13 +26,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.RouteViewModel
+import com.example.myapplication.UserViewModel
 import org.osmdroid.util.GeoPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun RouteInfo(route: RouteInfo, viewModel: MainViewModel, navController: NavController, context: Context) {
+fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavController) {
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             Text(route.name, fontSize = 30.sp)
@@ -87,10 +88,10 @@ fun RouteInfo(route: RouteInfo, viewModel: MainViewModel, navController: NavCont
     }
 }
 
-class Choice(val question: String, val options: List<String>, val initial_state: String) {
+class Choice(private val question: String, private val options: List<String>, private val initialState: String) {
     lateinit var selected: MutableState<String>
     @Composable
-    fun init() { selected = remember { mutableStateOf(initial_state) } }
+    fun init() { selected = remember { mutableStateOf(initialState) } }
 
     @Composable
     fun display() {
@@ -108,7 +109,7 @@ class Choice(val question: String, val options: List<String>, val initial_state:
 }
 
 @Composable
-fun IndividualConfig(viewModel: MainViewModel, route_name: String, navController: NavController, context: Context) {
+fun IndividualConfig(viewModel: RouteViewModel, route_name: String, navController: NavController) {
     val route = viewModel.routes.find {it.name == route_name}!!
     outerScaffold(navController, viewModel) {
         Column(
@@ -164,7 +165,7 @@ fun IndividualConfig(viewModel: MainViewModel, route_name: String, navController
 }
 
 @Composable
-fun editParticipants(route_name: String, viewModel: MainViewModel, navController: NavController, context: Context) {
+fun editParticipants(route_name: String, viewModel: RouteViewModel, navController: NavController, userViewModel: UserViewModel) {
     var route: RouteInfo? = null
     for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route
@@ -173,7 +174,7 @@ fun editParticipants(route_name: String, viewModel: MainViewModel, navController
     viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
-            chooseFriends(viewModel)
+            chooseFriends(viewModel, userViewModel)
             Spacer(Modifier.weight(1F))
             Row {
                 Button(
@@ -200,7 +201,7 @@ fun editParticipants(route_name: String, viewModel: MainViewModel, navController
 }
 
 @Composable
-fun editTime(route_name: String, viewModel: MainViewModel, navController: NavController, context: Context) {
+fun editTime(route_name: String, viewModel: RouteViewModel, navController: NavController) {
     var route: RouteInfo? = null
     for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route
@@ -241,7 +242,7 @@ fun editTime(route_name: String, viewModel: MainViewModel, navController: NavCon
 }
 
 @Composable
-fun editPosition(route_name: String, context: Context, viewModel: MainViewModel, navController: NavController) {
+fun editPosition(route_name: String, context: Context, viewModel: RouteViewModel, navController: NavController) {
     var route: RouteInfo? = null
     for (possible_route in viewModel.routes) {
         if (possible_route.name == route_name) route = possible_route

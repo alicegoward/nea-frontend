@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.checkPermissions
 
@@ -17,7 +18,7 @@ fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
                      viewModel: MainViewModel,
                      context: Context,
-                     gotoLogin: () -> Unit) {
+                     navController: NavController) {
     checkPermissions(true, singlePermission, multiplePermission, context, viewModel)
     Button(content = { Text(text=viewModel.buttonText) },
         onClick = {
@@ -25,6 +26,6 @@ fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
         },
         modifier = Modifier.padding(60.dp))
     if (viewModel.permissionsDone) {
-        LaunchedEffect(true) { gotoLogin() }
+        LaunchedEffect(true) { navController.navigate("loginScreen") }
     }
 }

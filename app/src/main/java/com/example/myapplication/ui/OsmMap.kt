@@ -16,14 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -37,7 +36,7 @@ import java.util.Locale
 
 
 @Composable
-fun OsmdroidMapView(viewModel: MainViewModel, context: Context, navController: NavController) {
+fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: NavController) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     viewModel.getLocation(fusedLocationProviderClient)
     AndroidView(
@@ -90,7 +89,7 @@ fun OsmdroidMapView(viewModel: MainViewModel, context: Context, navController: N
                         })
                     }
                     mapView.overlays.add(Polyline().apply {
-                        setPoints(viewModel.sampleRoute)
+                        setPoints(viewModel.routePoints)
                     })
                     mapView.invalidate()
                 }

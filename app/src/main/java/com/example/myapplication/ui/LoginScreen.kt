@@ -16,15 +16,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.myapplication.AppDatabase
 import com.example.myapplication.MainViewModel
 import com.example.myapplication.User
+import com.example.myapplication.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(viewModel: MainViewModel, context: Context, gotoMain: ()->Unit) {
+fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController) {
     var username_attempt by remember { mutableStateOf("")}
     var password_attempt by remember { mutableStateOf("")}
     val db = AppDatabase.getInstance(context)
@@ -45,7 +47,7 @@ fun LoginScreen(viewModel: MainViewModel, context: Context, gotoMain: ()->Unit) 
             userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
         }
         Log.d("user", viewModel.user!!)
-        LaunchedEffect(true) { gotoMain() }
+        LaunchedEffect(true) { navController.navigate(("mapScreen")) }
     }
     displaySnackbar(viewModel)
     Row(modifier = Modifier.padding(top=60.dp, start=30.dp)) {

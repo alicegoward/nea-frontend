@@ -17,20 +17,21 @@ class MainActivity : ComponentActivity() {
     private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
     private lateinit var singlePermission: ActivityResultLauncher<String>
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewModel : MainViewModel by viewModels()
+        val userViewModel : UserViewModel by viewModels()
+        val routeViewModel : RouteViewModel by viewModels()
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, viewModel)
+            checkPermissions(true, singlePermission, multiplePermission, this, userViewModel)
         }
         singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, viewModel)
+            checkPermissions(true, singlePermission, multiplePermission, this, userViewModel)
         }
         super.onCreate(savedInstanceState)
-        checkPermissions(false, singlePermission, multiplePermission, this, viewModel)
+        checkPermissions(false, singlePermission, multiplePermission, this, userViewModel)
         enableEdgeToEdge()
         startService(Intent(this, NotificationService::class.java))
         setContent{
-            Navigation(this, viewModel, singlePermission, multiplePermission)
+            Navigation(this, userViewModel, routeViewModel, singlePermission, multiplePermission)
         }
     }
 }

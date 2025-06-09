@@ -1,6 +1,5 @@
 package com.example.myapplication.ui
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,10 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.UserViewModel
 
 @Composable
-fun FriendScreen(viewModel: MainViewModel, navController: NavController) {
+fun FriendScreen(viewModel: UserViewModel, navController: NavController) {
     var current_friend by remember {mutableStateOf("")}
     outerScaffold(navController, viewModel) {
         Column(

@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import Route
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,8 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteViewModel
+import com.example.myapplication.UserViewModel
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -44,12 +47,12 @@ import java.util.Calendar
 
 
 @Composable
-fun CreateRoute(viewModel: MainViewModel, context: Context, navController: NavController) {
+fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context: Context, navController: NavController) {
     displaySnackbar(viewModel)
     Column(Modifier.padding(60.dp)) {
         when (viewModel.routeCreation.state) {
             RouteState.START -> start(viewModel)
-            RouteState.CHOOSE_FRIENDS -> chooseFriends(viewModel)
+            RouteState.CHOOSE_FRIENDS -> chooseFriends(viewModel, userViewModel)
             RouteState.CHOOSE_LOCATION -> chooseLocation(viewModel, context)
             RouteState.CHOOSE_END_TIME -> chooseEndTime(viewModel)
             RouteState.END -> end(viewModel, navController)
@@ -69,7 +72,7 @@ fun CreateRoute(viewModel: MainViewModel, context: Context, navController: NavCo
 }
 
 @Composable
-fun start(viewModel: MainViewModel) {
+fun start(viewModel: RouteViewModel) {
     Text("Route name")
     TextField(
         value = viewModel.routeCreation.name,
@@ -77,7 +80,7 @@ fun start(viewModel: MainViewModel) {
     )
 }
 
-fun end(viewModel: MainViewModel, navController: NavController) {
+fun end(viewModel: RouteViewModel, navController: NavController) {
     viewModel.routeCreation.state = RouteState.START
     viewModel.saveRoute()
     navController.navigate("routeManagerScreen")
@@ -85,7 +88,7 @@ fun end(viewModel: MainViewModel, navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun chooseEndTime(viewModel: MainViewModel) {
+fun chooseEndTime(viewModel: RouteViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
@@ -145,7 +148,7 @@ fun chooseEndTime(viewModel: MainViewModel) {
 }
 
 @Composable
-fun chooseLocation(viewModel: MainViewModel, context: Context) {
+fun chooseLocation(viewModel: RouteViewModel, context: Context) {
     lateinit var mapView: MapView
     AndroidView(
         modifier = Modifier
@@ -215,27 +218,27 @@ fun chooseLocation(viewModel: MainViewModel, context: Context) {
 }
 
 @Composable
-fun chooseFriends(MainViewModel: MainViewModel) {
-    if (MainViewModel.friends != null) {
+fun chooseFriends(routeViewModel: RouteViewModel, userViewModel: UserViewModel) {
+    if (userViewModel.friends != null) {
         Text("Select friends")
-        for (friend: String in MainViewModel.friends!!) {
+        for (friend: String in userViewModel.friends!!) {
             Row {
                 Text(friend)
                 Spacer(modifier = Modifier.weight(1F))
-                if (friend in MainViewModel.routeCreation.friends) {
+                if (friend in routeViewModel.routeCreation.friends) {
                     Button(
-                        onClick = { MainViewModel.routeCreation.friends.remove(friend) },
+                        onClick = { routeViewModel.routeCreation.friends.remove(friend) },
                         content = { Text("Remove") }
                     )
                 } else {
                     Button(
-                        onClick = { MainViewModel.routeCreation.friends.add(friend) },
+                        onClick = { routeViewModel.routeCreation.friends.add(friend) },
                         content = { Text("Add") }
                     )
                 }
             }
         }
     } else {
-        MainViewModel.getFriends()
+        userViewModel.getFriends()
     }
 }

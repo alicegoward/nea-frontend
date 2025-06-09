@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.LogLocation
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteViewModel
 import com.example.myapplication.isServiceRunning
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 @Composable
-fun RouteManager(viewModel: MainViewModel, context: Context, navController: NavController) {
+fun RouteManager(viewModel: RouteViewModel, context: Context, navController: NavController) {
     if (viewModel.routes == emptyList<RouteInfo>()) {
         viewModel.getRoutes()
     }

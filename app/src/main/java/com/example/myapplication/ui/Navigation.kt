@@ -9,13 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteViewModel
+import com.example.myapplication.UserViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 
 @Composable
 fun Navigation(context: Context,
-               viewModel: MainViewModel,
+               userViewModel: UserViewModel,
+               routeViewModel: RouteViewModel,
                singlePermission: ActivityResultLauncher<String>,
                multiplePermission: ActivityResultLauncher<Array<String>>
 ) {
@@ -29,91 +31,90 @@ fun Navigation(context: Context,
                     PermissionScreen(
                         singlePermission,
                         multiplePermission,
-                        viewModel,
-                        context = context,
-                        gotoLogin = {navController.navigate(("loginScreen"))},
+                        userViewModel,
+                        context,
+                        navController,
                     )
                 }
                 composable("loginScreen") {
-                    LoginScreen(viewModel,
+                    LoginScreen(
+                        userViewModel,
                         context,
-                        gotoMain = {navController.navigate(("mapScreen"))})
+                        navController)
                 }
                 composable("mapScreen") {
                     OsmdroidMapView(
-                        viewModel = viewModel,
-                        context = context,
-                        navController = navController
+                        routeViewModel,
+                        context,
+                        navController
                     )
                 }
                 composable("friendScreen") {
                     FriendScreen(
-                        viewModel = viewModel,
-                        navController = navController
+                        userViewModel,
+                        navController
                     )
                 }
                 composable("routeManagerScreen") {
-                    viewModel.getRoutes()
+                    routeViewModel.getRoutes()
                     RouteManager(
-                        viewModel = viewModel,
-                        context = context,
-                        navController = navController
+                        routeViewModel,
+                        context,
+                        navController
                     )
                 }
                 composable("notification_config/{route_name}") { backStackEntry ->
-                    val route_name = backStackEntry.arguments?.getString("route_name")!!
-                    viewModel.getIndividualConfig(viewModel.routes.find {it.name == route_name}!!)
+                    val routeName = backStackEntry.arguments?.getString("route_name")!!
+                    routeViewModel.getIndividualConfig(routeViewModel.routes.find {it.name == routeName}!!)
                     IndividualConfig(
-                        route_name =  route_name,
-                        viewModel = viewModel,
-                        navController = navController,
-                        context = context
+                        routeViewModel,
+                        routeName,
+                        navController,
                     )
                 }
                 composable("edit_time/{route_name}") { backStackEntry ->
                     editTime(
-                        route_name =  backStackEntry.arguments?.getString("route_name")!!,
-                        viewModel = viewModel,
-                        navController = navController,
-                        context = context
+                        backStackEntry.arguments?.getString("route_name")!!,
+                        routeViewModel,
+                        navController,
                     )
                 }
                 composable("edit_position/{route_name}") { backStackEntry ->
                     editPosition(
-                        route_name =  backStackEntry.arguments?.getString("route_name")!!,
-                        viewModel = viewModel,
-                        navController = navController,
-                        context = context
+                        backStackEntry.arguments?.getString("route_name")!!,
+                        context,
+                        routeViewModel,
+                        navController,
                     )
                 }
                 composable("edit_participants/{route_name}") { backStackEntry ->
                     editParticipants(
-                        route_name =  backStackEntry.arguments?.getString("route_name")!!,
-                        viewModel = viewModel,
-                        navController = navController,
-                        context = context
+                        backStackEntry.arguments?.getString("route_name")!!,
+                        routeViewModel,
+                        navController,
+                        userViewModel
                     )
                 }
                 composable("route_info/{route_name}") { backStackEntry ->
-                    val route_name = backStackEntry.arguments?.getString("route_name")
+                    val routeName = backStackEntry.arguments?.getString("route_name")
                     var routeInfo: RouteInfo? = null
-                    for (i in viewModel.routes) {
-                        if (i.name == route_name) {
+                    for (i in routeViewModel.routes) {
+                        if (i.name == routeName) {
                             routeInfo = i
                         }
                     }
                     RouteInfo(
-                        route = routeInfo!!,
-                        viewModel = viewModel,
-                        navController = navController,
-                        context = context
+                        routeInfo!!,
+                        userViewModel,
+                        navController,
                     )
                 }
                 composable("create_route") {
                     CreateRoute(
-                        viewModel = viewModel,
-                        context = context,
-                        navController = navController
+                        routeViewModel,
+                        userViewModel,
+                        context,
+                        navController
                     )
                 }
             }
