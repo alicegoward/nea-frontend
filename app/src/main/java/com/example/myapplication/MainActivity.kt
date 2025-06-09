@@ -21,13 +21,13 @@ class MainActivity : ComponentActivity() {
         val routeViewModel : RouteViewModel by viewModels()
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, userViewModel)
+            checkPermissions(true, singlePermission, multiplePermission, this, routeViewModel)
         }
         singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, userViewModel)
+            checkPermissions(true, singlePermission, multiplePermission, this, routeViewModel)
         }
         super.onCreate(savedInstanceState)
-        checkPermissions(false, singlePermission, multiplePermission, this, userViewModel)
+        checkPermissions(false, singlePermission, multiplePermission, this, routeViewModel)
         enableEdgeToEdge()
         startService(Intent(this, NotificationService::class.java))
         setContent{

@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import Route
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
@@ -17,7 +18,7 @@ fun checkPermissions(clicked : Boolean,
                      singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
                      context: Context,
-                     viewModel: MainViewModel) {
+                     viewModel: RouteViewModel) {
     if (!checkPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
         viewModel.buttonText = "Notification permission"
         if( clicked ) {

@@ -12,38 +12,7 @@ class UserViewModel: MainViewModel() {
     var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
     var pending_requests: MutableCollection<String>? by mutableStateOf(null)
     var create_account by mutableStateOf(false)
-    var user: String? by mutableStateOf(null)
-    var password: String? by mutableStateOf(null)
-    var error_text: String? by mutableStateOf(null)
     var error_add_friend: String? by mutableStateOf(null)
-    fun createUser(to_check: String, password: String) {
-        getData {
-            val status = mainAPI.postUserData(UsernamePassword(to_check, password))
-            Log.d("user create status", status.toString())
-            if (status.code() == 200) {
-                user = to_check
-            } else {
-                error_text = status.body()?.reason
-                Log.e("create account", error_text.toString())
-            }
-        }
-    }
-
-    fun loginUser(to_check: String, password: String) {
-        getData {
-            val user_data = mainAPI.loginUser(UsernamePassword(to_check, password))
-            Log.d("data", user_data.body().toString())
-            if (user_data.code() == 200) {
-                okHttpClient = createClient(user_data.body()!!.token)
-                mainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
-                user = to_check
-                this.password = password
-            } else {
-                error_text = user_data.body()?.reason
-                Log.e("login", error_text.toString())
-            }
-        }
-    }
 
     fun getFriends() {
         getData {

@@ -31,7 +31,7 @@ fun Navigation(context: Context,
                     PermissionScreen(
                         singlePermission,
                         multiplePermission,
-                        userViewModel,
+                        routeViewModel,
                         context,
                         navController,
                     )
@@ -40,7 +40,8 @@ fun Navigation(context: Context,
                     LoginScreen(
                         userViewModel,
                         context,
-                        navController)
+                        navController,
+                        routeViewModel)
                 }
                 composable("mapScreen") {
                     OsmdroidMapView(

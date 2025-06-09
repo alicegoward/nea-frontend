@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import Route
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.AppDatabase
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteViewModel
 import com.example.myapplication.User
 import com.example.myapplication.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController) {
+fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController, routeViewModel: RouteViewModel) {
     var username_attempt by remember { mutableStateOf("")}
     var password_attempt by remember { mutableStateOf("")}
     val db = AppDatabase.getInstance(context)
@@ -41,6 +42,7 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
     }
 
     if (viewModel.user != null) {
+        routeViewModel.mainAPI = viewModel.mainAPI
         CoroutineScope(Dispatchers.IO).launch {
             userDao.deleteUser()
             Log.d("dao", userDao.getUserPass().toString())
