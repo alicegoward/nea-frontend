@@ -53,7 +53,8 @@ fun Navigation(context: Context,
                 composable("friendScreen") {
                     FriendScreen(
                         userViewModel,
-                        navController
+                        navController,
+                        context
                     )
                 }
                 composable("routeManagerScreen") {

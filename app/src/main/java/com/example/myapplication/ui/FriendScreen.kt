@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,16 +13,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myapplication.AppDatabase
 import com.example.myapplication.UserViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun FriendScreen(viewModel: UserViewModel, navController: NavController) {
+fun FriendScreen(viewModel: UserViewModel, navController: NavController, context: Context) {
     var current_friend by remember {mutableStateOf("")}
+    val coroutineScope = rememberCoroutineScope()
     outerScaffold(navController, viewModel) {
         Column(
             modifier = Modifier
@@ -29,6 +37,14 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController) {
                 .padding(60.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Button(onClick = {
+                coroutineScope.launch {
+                    viewModel.logout()
+                    val userDao = AppDatabase.getInstance(context).UserDao()
+                    userDao.deleteUser()
+                    navController.navigate("loginScreen")
+                }
+            }, content = { Text("Logout") })
             Text("Friends")
             if (viewModel.friends != null) {
                 for (friend: String in viewModel.friends!!) {

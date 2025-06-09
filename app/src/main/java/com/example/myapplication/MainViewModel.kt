@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 
 open class MainViewModel : ViewModel() {
-    var user: String? = null
+    var user: String? by mutableStateOf(null)
     var password: String? by mutableStateOf(null)
     var mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     var toastText by mutableStateOf("")
@@ -23,6 +23,7 @@ open class MainViewModel : ViewModel() {
             Log.d("user create status", status.toString())
             if (status.code() == 200) {
                 user = to_check
+                this.password = password
             } else {
                 error_text = status.body()?.reason
                 Log.e("create account", error_text.toString())
@@ -39,6 +40,7 @@ open class MainViewModel : ViewModel() {
                 mainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
                 user = to_check
                 this.password = password
+                Log.d("user", user.toString())
             } else {
                 error_text = user_data.body()?.reason
                 Log.e("login", error_text.toString())

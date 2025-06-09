@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.myapplication.RetrofitHelper.createClient
-import com.example.myapplication.RetrofitHelper.okHttpClient
 
 class UserViewModel: MainViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
@@ -47,5 +45,10 @@ class UserViewModel: MainViewModel() {
             error_add_friend = data.body()?.reason
             getFriends()
         }
+    }
+    fun logout() {
+        user=null
+        password = null
+        friends = null
     }
 }

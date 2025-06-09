@@ -33,7 +33,7 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
     val db = AppDatabase.getInstance(context)
     val userDao = db.UserDao()
 
-    CoroutineScope(Dispatchers.IO).launch {
+    LaunchedEffect(Unit) {
         val credentials = userDao.getUserPass()
         Log.d("CREDENTIALS", credentials.toString())
         if (credentials.isNotEmpty()) {
@@ -42,14 +42,12 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
     }
 
     if (viewModel.user != null) {
-        routeViewModel.mainAPI = viewModel.mainAPI
-        CoroutineScope(Dispatchers.IO).launch {
+        LaunchedEffect(viewModel.user, viewModel.password) {
+            routeViewModel.mainAPI = viewModel.mainAPI
             userDao.deleteUser()
-            Log.d("dao", userDao.getUserPass().toString())
             userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
+            navController.navigate("mapScreen")
         }
-        Log.d("user", viewModel.user!!)
-        LaunchedEffect(true) { navController.navigate(("mapScreen")) }
     }
     displaySnackbar(viewModel)
     Row(modifier = Modifier.padding(top=60.dp, start=30.dp)) {

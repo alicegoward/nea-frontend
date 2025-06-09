@@ -51,6 +51,7 @@ class RouteViewModel: MainViewModel() {
         if (route == activeRoute) {
             activeRoute = null
             itineraries = null
+            routePoints = emptyList()
             getData {
                 mainAPI.deactivateRoute()
             }
