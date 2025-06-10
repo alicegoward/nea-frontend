@@ -1,12 +1,16 @@
 package com.example.myapplication.ui
 
-import Route
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -15,27 +19,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.AppDatabase
 import com.example.myapplication.RouteViewModel
 import com.example.myapplication.User
 import com.example.myapplication.UserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController, routeViewModel: RouteViewModel) {
-    var username_attempt by remember { mutableStateOf("")}
-    var password_attempt by remember { mutableStateOf("")}
+    var usernameAttempt by remember { mutableStateOf("")}
+    var passwordAttempt by remember { mutableStateOf("")}
     val db = AppDatabase.getInstance(context)
     val userDao = db.UserDao()
 
     LaunchedEffect(Unit) {
         val credentials = userDao.getUserPass()
-        Log.d("CREDENTIALS", credentials.toString())
         if (credentials.isNotEmpty()) {
             viewModel.loginUser(credentials[0].username, credentials[0].password)
         }
@@ -50,46 +52,59 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
         }
     }
     displaySnackbar(viewModel)
-    Row(modifier = Modifier.padding(top=60.dp, start=30.dp)) {
-        Button(
-            onClick = { viewModel.create_account = false }
-        ) {
-            Text("Login")
+    Column {
+        Row(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+            FilledTonalButton (
+                onClick = { viewModel.create_account = false },
+                Modifier.weight(1F).fillMaxHeight(),
+                shape = RoundedCornerShape(0.dp)
+            ) {
+                Text("Login", Modifier.align(Alignment.Bottom).padding(10.dp), fontSize = 16.sp)
+            }
+            FilledTonalButton (
+                onClick = { viewModel.create_account = true },
+                Modifier.weight(1F).fillMaxHeight(),
+                shape = RoundedCornerShape(0.dp)
+            ) {
+                Text("Create account",Modifier.align(Alignment.Bottom).padding(10.dp), fontSize = 16.sp)
+            }
         }
-        Button(
-            onClick = { viewModel.create_account = true },
-        ) {
-            Text("Create account")
-        }
-    }
-    Column(modifier = Modifier.padding(top=120.dp, start=30.dp)) {
+        Spacer(Modifier.height(30.dp))
+        Text("Username", Modifier.padding(horizontal = 50.dp))
+        Spacer(Modifier.height(5.dp))
         TextField(
-            value = username_attempt,
-            onValueChange = { username_attempt = it },
+            modifier = Modifier.padding(horizontal = 50.dp).fillMaxWidth(),
+            value = usernameAttempt,
+            onValueChange = { usernameAttempt = it },
             label = { Text("Username") },
         )
+        Spacer(Modifier.height(30.dp))
+        Text("Password", Modifier.padding(horizontal = 50.dp))
+        Spacer(Modifier.height(5.dp))
         TextField(
-            value = password_attempt,
-            onValueChange = { password_attempt = it },
+            modifier = Modifier.padding(horizontal = 50.dp).fillMaxWidth(),
+            value = passwordAttempt,
+            onValueChange = { passwordAttempt = it },
             label = { Text("Password") },
         )
         Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(50.dp),
             onClick = {
                 if (viewModel.create_account) {
-                    viewModel.createUser(username_attempt, password_attempt)
+                    viewModel.createUser(usernameAttempt, passwordAttempt)
                 } else {
-                    viewModel.loginUser(username_attempt, password_attempt)
+                    viewModel.loginUser(usernameAttempt, passwordAttempt)
                 }
             },
         ) {
             if (viewModel.create_account) {
-                Text("Create account")
+                Text("Create account", fontSize = 16.sp)
             } else {
-                Text("Login")
+                Text("Login", fontSize = 16.sp)
             }
         }
         if (viewModel.error_text != null) {
-            Text(viewModel.error_text!!)
+            Text(viewModel.error_text!!, Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }
