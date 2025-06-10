@@ -1,10 +1,6 @@
 package com.example.myapplication.ui
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -43,8 +39,8 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
-        factory = { context ->
-            MapView(context).apply {
+        factory = {
+            MapView(it).apply {
                 setTileSource(TileSourceFactory.MAPNIK)
                 setMultiTouchControls(true)
                 controller.setCenter(viewModel.position)
@@ -58,39 +54,42 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
                     val location = Marker(mapView).apply {
                         position = viewModel.position
                         setInfoWindow(null)
-                        icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.ic_launcher_foreground)
+                        icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.current_location)
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-
                     }
                     if (mapView.overlays.isEmpty()) {
                         mapView.controller.setCenter(viewModel.position)
                     }
                     mapView.overlays.clear()
+                    mapView.overlays.add(Polyline().apply {
+                        setPoints(viewModel.routePoints)
+                    })
                     mapView.overlays.add(location)
                     Log.d("route geometry size", viewModel.other_routes.size.toString())
                     viewModel.other_routes.forEach {
                         Log.d("route geometry maybe", it.value.toString())
                         mapView.overlays.add(Polyline().apply {
                             setPoints(it.value)
-                            setColor(android.graphics.Color.argb(255,255,0,0))
+                            color = android.graphics.Color.argb(255,255,0,0)
                         })
                     }
-                    val bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
-                    val paint = Paint().apply {
-                        setColor(android.graphics.Color.argb(255, 0, 0, 255))
-                    }
-                    Canvas(bitmap).drawRect(0F, 0F, 50F, 50F, paint)
                     viewModel.waypoints.forEach {
                         mapView.overlays.add(Marker(mapView).apply {
                             position = it
                             setInfoWindow(null)
-                            icon = BitmapDrawable(context.resources, bitmap)
+                            icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.waypoint)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         })
                     }
-                    mapView.overlays.add(Polyline().apply {
-                        setPoints(viewModel.routePoints)
-                    })
+                    if (viewModel.routePoints.isNotEmpty()) {
+                        mapView.overlays.add(Marker(mapView).apply {
+                            position = viewModel.routePoints.last()
+                            setInfoWindow(null)
+                            icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.end)
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        })
+                    }
+
                     mapView.invalidate()
                 }
             }
