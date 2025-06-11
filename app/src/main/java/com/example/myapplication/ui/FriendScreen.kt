@@ -64,7 +64,7 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
             Text("Friend requests", fontSize = 20.sp)
             if (viewModel.pending_requests != null) {
                 for (request: String in viewModel.pending_requests!!) {
-                    Row(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth(),  verticalAlignment = Alignment.CenterVertically) {
                         Text(request)
                         Spacer(modifier = Modifier.weight(1F))
                         TextButton (

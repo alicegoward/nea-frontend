@@ -11,9 +11,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.LogLocation
 import com.example.myapplication.RouteViewModel
@@ -34,18 +37,14 @@ fun RouteManager(viewModel: RouteViewModel, context: Context, navController: Nav
     viewModel.getLocation(fusedLocationClient)
     outerScaffold(navController, viewModel) {
         Column(
-            modifier = Modifier.padding(60.dp).verticalScroll(rememberScrollState())
+            modifier = Modifier.padding(top=40.dp).verticalScroll(rememberScrollState())
         ) {
-            Text("My routes")
+            Text("My routes", fontSize = 20.sp, modifier = Modifier.padding(vertical = 15.dp, horizontal=30.dp))
             for (route in viewModel.routes) {
-                Row(modifier = Modifier.padding(vertical = 30.dp)) {
+                Row(modifier = Modifier.padding(horizontal = 30.dp, vertical = 15.dp)) {
                     Text(route.name)
                     Spacer(Modifier.weight(1F))
-                    Column {
-                        Button(
-                            onClick = { navController.navigate("route_info/${route.name}") },
-                            content = { Text("more info") }
-                        )
+                    Column(horizontalAlignment = Alignment.End) {
                         Button(
                             onClick = {
                                 if (viewModel.activeRoute == route) {
@@ -54,14 +53,18 @@ fun RouteManager(viewModel: RouteViewModel, context: Context, navController: Nav
                                 viewModel.activateRoute(route)
                             },
                             content = {
-                                if (viewModel.activeRoute == route) Text("deactivate")
-                                else Text("activate")
+                                if (viewModel.activeRoute == route) Text("Deactivate")
+                                else Text("Activate")
                             }
+                        )
+                        TextButton (
+                            onClick = { navController.navigate("route_info/${route.name}") },
+                            content = { Text("More info") }
                         )
                     }
                 }
             }
-            Button(
+            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = { navController.navigate("create_route") },
                 content = { Text("create route") })
         }

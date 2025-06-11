@@ -97,7 +97,7 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
     )
     outerScaffold (navController, viewModel) {
         if (viewModel.itineraries != null) {
-            Column(Modifier.fillMaxWidth().background(Color.Gray).padding(60.dp)) {
+            Column(Modifier.fillMaxWidth().padding(20.dp)) {
                 for (itinerary in viewModel.itineraries!!) {
                     Row {
                         Text(itinerary.username)
