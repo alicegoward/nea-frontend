@@ -16,8 +16,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,51 +40,50 @@ fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavCont
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             Text(route.name, fontSize = 30.sp)
-            Text("com.example.myapplication.Route participants:", fontSize = 20.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Route participants:", fontSize = 20.sp)
+                Spacer(Modifier.weight(1f))
+                if (route.admin == viewModel.user) {
+                    TextButton(
+                        content = { Text("Edit") },
+                        onClick = { navController.navigate("edit_participants/${route.name}") }
+                    )
+                }
+            }
             Text(route.admin + " (route admin)")
             for (member: String in route.participants.values) {
-                Text(member)
-            }
-            if (route.admin == viewModel.user) {
-                Button(
-                    content = { Text("Edit participants") },
-                    onClick = { navController.navigate("edit_participants/${route.name}") }
-                )
+                if (member != route.admin) Text(member)
             }
             Text("Meeting details:", fontSize = 20.sp)
-            Row {
-                Text("Where: " + route.junction_name)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(route.junction_name)
                 if (route.admin == viewModel.user) {
                     Spacer(Modifier.weight(1f))
-                    Button(
+                    TextButton(
                         content = { Text("Edit") },
                         onClick = { navController.navigate("edit_position/${route.name}") }
                     )
                 }
             }
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "When: " + SimpleDateFormat(
-                        "EEEE MMMM d HH:mm",
+                        "EEEE MMMM d\n HH:mm",
                         Locale.UK
                     ).format(Date(route.end_time * 1000))
                 )
                 if (route.admin == viewModel.user) {
                     Spacer(Modifier.weight(1f))
-                    Button(
+                    TextButton (
                         content = { Text("Edit") },
                         onClick = { navController.navigate("edit_time/${route.name}") }
                     )
                 }
             }
-            Button(
-                content = { Text("Configure individual notification / meet on route behaviour") },
-                onClick = { navController.navigate("notification_config/${route.name}") }
-            )
-            Spacer(Modifier.weight(1f))
-            Button(
-                content = { Text("go back") },
-                onClick = { navController.navigate("routeManagerScreen") }
+            FilledTonalButton (
+                content = { Text("Configure route behaviour") },
+                onClick = { navController.navigate("notification_config/${route.name}") },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }
@@ -174,7 +175,7 @@ fun editParticipants(route_name: String, viewModel: RouteViewModel, navControlle
     viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
-            chooseFriends(viewModel, userViewModel)
+            start(viewModel, userViewModel, name = false)
             Spacer(Modifier.weight(1F))
             Row {
                 Button(

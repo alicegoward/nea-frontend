@@ -7,11 +7,10 @@ import androidx.compose.runtime.setValue
 import org.osmdroid.util.GeoPoint
 
 enum class RouteState {
-    START, CHOOSE_FRIENDS, CHOOSE_LOCATION, CHOOSE_END_TIME, END;
+    START, CHOOSE_LOCATION, CHOOSE_END_TIME, END;
     fun next(): RouteState {
         return when (this) {
-            START -> CHOOSE_FRIENDS
-            CHOOSE_FRIENDS -> CHOOSE_LOCATION
+            START -> CHOOSE_LOCATION
             CHOOSE_LOCATION -> CHOOSE_END_TIME
             CHOOSE_END_TIME -> END
             END -> START
@@ -20,8 +19,7 @@ enum class RouteState {
     fun prev(): RouteState {
         return when (this) {
             START -> START
-            CHOOSE_FRIENDS -> START
-            CHOOSE_LOCATION -> CHOOSE_FRIENDS
+            CHOOSE_LOCATION -> START
             CHOOSE_END_TIME -> CHOOSE_LOCATION
             END -> CHOOSE_END_TIME
         }
