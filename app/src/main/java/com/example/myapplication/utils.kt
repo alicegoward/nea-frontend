@@ -8,11 +8,16 @@ import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 
-
+/**
+ * checks a single permission
+ */
 fun checkPermission(context: Context, permission: String): Boolean {
     return (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
 }
 
+/**
+ * Checks all the required permissions, requests ones it does not have
+ */
 fun checkPermissions(clicked : Boolean,
                      singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,
@@ -46,6 +51,9 @@ fun checkPermissions(clicked : Boolean,
     }
 }
 
+/**
+ * Checks if the location service is currently running
+ */
 fun isServiceRunning(context: Context): Boolean {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {

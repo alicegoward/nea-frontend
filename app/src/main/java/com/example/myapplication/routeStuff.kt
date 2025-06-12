@@ -6,8 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.osmdroid.util.GeoPoint
 
+/**
+ * Different states that the route creation can currently be
+ */
 enum class RouteState {
     START, CHOOSE_LOCATION, CHOOSE_END_TIME, END;
+
+    /**
+     * @return next route state
+     */
     fun next(): RouteState {
         return when (this) {
             START -> CHOOSE_LOCATION
@@ -16,6 +23,10 @@ enum class RouteState {
             END -> START
         }
     }
+
+    /**
+     * @return previous route state
+     */
     fun prev(): RouteState {
         return when (this) {
             START -> START
@@ -26,6 +37,9 @@ enum class RouteState {
     }
 }
 
+/**
+ * route during creation
+ */
 class Route(EndLocation: GeoPoint) {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
@@ -34,6 +48,10 @@ class Route(EndLocation: GeoPoint) {
     var endTime: Int? = null
     var name by mutableStateOf("")
 
+    /**
+     * @param username name of user creating the route
+     * @return data about the route to send to the server
+     */
     fun toRouteModel(username: String): RouteData {
         val friendDict = HashMap<Int, String>()
         friends.forEachIndexed {idx, item -> friendDict[idx] = item}
@@ -49,6 +67,9 @@ class Route(EndLocation: GeoPoint) {
     }
 }
 
+/**
+ * Various info about a route including individual configuration data
+ */
 data class RouteInfo(val routeData: RouteData) {
     val name = routeData.name
     val end_lat = routeData.lat

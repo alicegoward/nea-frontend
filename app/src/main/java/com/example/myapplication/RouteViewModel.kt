@@ -16,6 +16,9 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+/**
+ * view model that handles route-related aspects of the application
+ */
 class RouteViewModel: MainViewModel() {
     var position by mutableStateOf(GeoPoint(0.0, 0.0))
     private lateinit var locationCallback: LocationCallback
@@ -30,6 +33,9 @@ class RouteViewModel: MainViewModel() {
     var permissionsDone by mutableStateOf(false)
     var buttonText by mutableStateOf("")
 
+    /**
+     * Saves the route currently being created to the server
+     */
     fun saveRoute() {
         getData {
             Log.d("user", user.toString())
@@ -40,12 +46,19 @@ class RouteViewModel: MainViewModel() {
         }
     }
 
+    /**
+     * Gets routes the user is a part of
+     */
     fun getRoutes() {
         getData {
             routes = mainAPI.getRoutes().body()!!.data.map { i -> RouteInfo(i.value) }
         }
     }
 
+    /**
+     * Activates or deactivates the route, updating what is displayed on the map in the process
+     * @param route route that is (de)activated
+     */
     fun activateRoute(route: RouteInfo) {
         if (route == activeRoute) {
             activeRoute = null
@@ -74,6 +87,11 @@ class RouteViewModel: MainViewModel() {
             }
         }
     }
+
+    /**
+     * Saves any changes to the route to the server
+     * @param data route data to save
+     */
     fun updateRouteInfo(data: Map<String, String>) {
         getData {
             Log.d("have data", data.toString())
@@ -82,6 +100,10 @@ class RouteViewModel: MainViewModel() {
         }
     }
 
+    /**
+     * sets the individual meeting and notification tolerances in the server
+     * @param route route to get tolerances to save from
+     */
     fun setIndividualConfig(route: RouteInfo) {
         getData {
             mainAPI.setIndividualConfig(ConfigData(
@@ -96,6 +118,10 @@ class RouteViewModel: MainViewModel() {
         }
     }
 
+    /**
+     * gets current meeting and notification tolerances from the server
+     * @param route route to get information about
+     */
     fun getIndividualConfig(route: RouteInfo) {
         getData {
             val config = mainAPI.getIndividualConfig(UserOnRoute(route.name)).body()
@@ -106,6 +132,10 @@ class RouteViewModel: MainViewModel() {
         }
     }
 
+    /**
+     * Starts location callbacks, which update the user interface and send the new datapoint to the server
+     * @param fusedLocationProviderClient link to Android's location API
+     */
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
         locationCallback = object : LocationCallback() {
@@ -140,7 +170,10 @@ class RouteViewModel: MainViewModel() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
-
+    /**
+     * Manual notification to other users that the user may not make it on time
+     * @param meaning whether the user is running late or is lost
+     */
     fun sendOthersNotification(meaning: String) {
         getData {
             if (meaning == "late") {
@@ -151,6 +184,11 @@ class RouteViewModel: MainViewModel() {
         }
     }
 
+    /**
+     * Converts a list of people at a waypoint to text to display
+     * @param people waypoint participants
+     * @param person person who's itinerary it is
+     */
     fun convertToParticipants(people: MutableList<String>, person: String): String {
         people.remove(person)
         var text = ""

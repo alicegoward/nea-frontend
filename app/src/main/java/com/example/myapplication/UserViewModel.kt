@@ -5,6 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
+/**
+ * view model that aspects user-related aspects of the application
+ */
 class UserViewModel: MainViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
     var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
@@ -12,6 +15,9 @@ class UserViewModel: MainViewModel() {
     var create_account by mutableStateOf(false)
     var error_add_friend: String? by mutableStateOf(null)
 
+    /**
+     * Gets the user's list of incoming, outgoing and full friends
+     */
     fun getFriends() {
         getData {
             if (user != null) {
@@ -24,7 +30,10 @@ class UserViewModel: MainViewModel() {
         }
     }
 
-
+    /**
+     * @param request user's request to update the status for
+     * @param state whether the request has been accepted or declined
+     */
     fun update_request(request: String, state: String) {
         getData {
             mainAPI.updateRequest(UpdateRequest(user!!, request, state))
@@ -32,7 +41,9 @@ class UserViewModel: MainViewModel() {
         }
     }
 
-
+    /**
+     * @param to_add friend to send request to
+     */
     fun addFriend(to_add: String) {
         getData {
             val data = mainAPI.addFriend(
@@ -46,6 +57,10 @@ class UserViewModel: MainViewModel() {
             getFriends()
         }
     }
+
+    /**
+     * logs user out of view model
+     */
     fun logout() {
         user=null
         password = null

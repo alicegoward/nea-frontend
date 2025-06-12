@@ -1,8 +1,13 @@
+package com.example.myapplication
+
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+/**
+ * Preconfigured Retrofit instance using OkHttpClient
+ */
 object RetrofitHelper {
 
     private const val BASE_URL = "http://192.168.137.1:8000/api/"
@@ -22,6 +27,9 @@ object RetrofitHelper {
             .build()
     }
 
+    /**
+     * @return Retrofit instance
+     */
     fun getInstance(): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -31,6 +39,9 @@ object RetrofitHelper {
     }
 }
 
+/**
+ * Singleton to manage the token
+ */
 object TokenManager {
     var token: String? = null
 }

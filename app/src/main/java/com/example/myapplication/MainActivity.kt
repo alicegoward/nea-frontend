@@ -16,6 +16,11 @@ import org.osmdroid.library.BuildConfig
 class MainActivity : ComponentActivity() {
     private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
     private lateinit var singlePermission: ActivityResultLauncher<String>
+
+    /**
+     * Creates the relevant view models, and creates permissions dialogues.
+     * Runs navigation, which displays the relevant screen.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         val userViewModel : UserViewModel by viewModels()
         val routeViewModel : RouteViewModel by viewModels()

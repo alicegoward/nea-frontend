@@ -13,8 +13,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-
+/**
+ * Service that polls for location updates at regular intervals
+ */
 class NotificationService : Service() {
+    /**
+     * Checks for any new notifications every 30s, and notifies the user if so.
+     * This is a background service, so runs continuously
+     */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("stuff","started service")
         val channel = NotificationChannel("api_notifications", "api", NotificationManager.IMPORTANCE_DEFAULT).apply {
@@ -25,7 +31,7 @@ class NotificationService : Service() {
         notificationManager.createNotificationChannel(channel)
         val builder = NotificationCompat.Builder(this, "api_notifications")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("aa")
+            .setContentTitle("NEA frontend")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         val userDao = AppDatabase.getInstance(this).UserDao()
         var user: String? = null
