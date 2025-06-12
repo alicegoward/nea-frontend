@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import Route
 import android.Manifest
 import android.app.ActivityManager
 import android.content.Context

@@ -50,17 +50,7 @@ open class MainViewModel : ViewModel() {
 
     fun getData(doStuff: suspend () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                doStuff()
-                toastText = ""
-            } catch (e: NullPointerException) {
-                toastText = "Server Error"
-            } catch (e: SocketTimeoutException) {
-                toastText = "Network Error"
-            } catch (e: Exception) {
-                toastText = "Unknown Error"
-            }
-            Log.d("toast", toastText)
+            doStuff()
         }
     }
 }

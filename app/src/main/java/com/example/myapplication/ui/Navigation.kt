@@ -1,6 +1,6 @@
 package com.example.myapplication.ui
 
-import RouteInfo
+import com.example.myapplication.RouteInfo
 import android.content.Context
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher

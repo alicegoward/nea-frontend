@@ -46,6 +46,7 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
     if (viewModel.user != null) {
         LaunchedEffect(viewModel.user, viewModel.password) {
             routeViewModel.mainAPI = viewModel.mainAPI
+            routeViewModel.user = viewModel.user
             userDao.deleteUser()
             userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
             navController.navigate("mapScreen")

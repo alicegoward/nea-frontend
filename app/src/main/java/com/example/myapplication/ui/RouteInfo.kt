@@ -1,7 +1,7 @@
 package com.example.myapplication.ui
 
-import Route
-import RouteInfo
+import com.example.myapplication.Route
+import com.example.myapplication.RouteInfo
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.padding
@@ -38,7 +38,7 @@ fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavCont
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             Text(route.name, fontSize = 30.sp)
-            Text("Route participants:", fontSize = 20.sp)
+            Text("com.example.myapplication.Route participants:", fontSize = 20.sp)
             Text(route.admin + " (route admin)")
             for (member: String in route.participants.values) {
                 Text(member)

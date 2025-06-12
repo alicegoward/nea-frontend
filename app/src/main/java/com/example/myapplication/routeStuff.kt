@@ -1,8 +1,9 @@
+package com.example.myapplication
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.myapplication.RouteData
 import org.osmdroid.util.GeoPoint
 
 enum class RouteState {
@@ -13,7 +14,7 @@ enum class RouteState {
             CHOOSE_FRIENDS -> CHOOSE_LOCATION
             CHOOSE_LOCATION -> CHOOSE_END_TIME
             CHOOSE_END_TIME -> END
-            END -> END
+            END -> START
         }
     }
     fun prev(): RouteState {

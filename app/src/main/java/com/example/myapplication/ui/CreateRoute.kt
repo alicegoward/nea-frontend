@@ -1,6 +1,5 @@
 package com.example.myapplication.ui
 
-import Route
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +32,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.myapplication.R
-import com.example.myapplication.MainViewModel
+import com.example.myapplication.RouteState
 import com.example.myapplication.RouteViewModel
 import com.example.myapplication.UserViewModel
 import org.osmdroid.events.MapListener
@@ -81,6 +80,7 @@ fun start(viewModel: RouteViewModel) {
 }
 
 fun end(viewModel: RouteViewModel, navController: NavController) {
+    Log.d("a","currently ending route")
     viewModel.routeCreation.state = RouteState.START
     viewModel.saveRoute()
     navController.navigate("routeManagerScreen")

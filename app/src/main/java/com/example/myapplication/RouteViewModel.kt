@@ -1,7 +1,5 @@
 package com.example.myapplication
 
-import Route
-import RouteInfo
 import android.annotation.SuppressLint
 import android.os.Looper
 import android.util.Log
@@ -34,6 +32,7 @@ class RouteViewModel: MainViewModel() {
 
     fun saveRoute() {
         getData {
+            Log.d("user", user.toString())
             mainAPI.postRoute(routeCreation.toRouteModel(user!!))
             Log.d("route","saved")
             routeCreation = Route(this@RouteViewModel.position)
@@ -150,5 +149,20 @@ class RouteViewModel: MainViewModel() {
                 mainAPI.notifyOthers(DataToNotify("$user is lost", activeRoute!!.name, user!!))
             }
         }
+    }
+
+    fun convertToParticipants(people: MutableList<String>, person: String): String {
+        people.remove(person)
+        var text = ""
+        if (people.size > 1) {
+            for (i in 0..<people.size - 1) {
+                text += "${people[i]}, "
+            }
+            text = text.dropLast(2)
+            text += " and ${people[people.size - 1]}"
+        } else {
+            text = people[0]
+        }
+        return text
     }
 }
