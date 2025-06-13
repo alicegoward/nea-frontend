@@ -24,6 +24,12 @@ import com.example.myapplication.isServiceRunning
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
+/**
+ * displays list of routes with option to activate or view information about each one
+ * @param viewModel route view model
+ * @param context application context
+ * @param navController navigation
+ */
 @Composable
 fun RouteManager(viewModel: RouteViewModel, context: Context, navController: NavController) {
     if (viewModel.routes == emptyList<RouteInfo>()) {

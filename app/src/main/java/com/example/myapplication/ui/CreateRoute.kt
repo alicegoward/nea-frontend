@@ -50,6 +50,13 @@ import org.osmdroid.views.overlay.Marker
 import java.util.Calendar
 
 
+/**
+ * Wrapper function for each route creation screen
+ * @param viewModel route view model
+ * @param userViewModel user view model
+ * @param context application context
+ * @param navController navigation
+ */
 @Composable
 fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context: Context, navController: NavController) {
     displaySnackbar(viewModel)
@@ -75,6 +82,12 @@ fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context
     }
 }
 
+/**
+ * first route creation screen - inputs the route name and participants
+ * @param routeViewModel route view model
+ * @param userViewModel user view model
+ * @param name whether the route name should also be inputted (false in edit mode)
+ */
 @Composable
 fun start(routeViewModel: RouteViewModel, userViewModel: UserViewModel, name: Boolean) {
     if (name) {
@@ -109,12 +122,21 @@ fun start(routeViewModel: RouteViewModel, userViewModel: UserViewModel, name: Bo
     }
 }
 
+/**
+ * saves the route and goes back to the route manager
+ * @param viewModel route view model
+ * @param navController navigation
+ */
 fun end(viewModel: RouteViewModel, navController: NavController) {
     viewModel.routeCreation.state = RouteState.START
     viewModel.saveRoute()
     navController.navigate("routeManagerScreen")
 }
 
+/**
+ * Choosing the end day and time for the meeting
+ * @param viewModel route view model
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun chooseEndTime(viewModel: RouteViewModel) {
@@ -196,6 +218,11 @@ fun chooseEndTime(viewModel: RouteViewModel) {
     }
 }
 
+/**
+ * choose location screen - move the map until the pin is over the desired location
+ * @param viewModel route view model
+ * @param context application context
+ */
 @Composable
 fun chooseLocation(viewModel: RouteViewModel, context: Context) {
     Column(Modifier.fillMaxSize(0.75f)) {

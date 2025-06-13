@@ -29,6 +29,14 @@ import com.example.myapplication.RouteViewModel
 import com.example.myapplication.User
 import com.example.myapplication.UserViewModel
 
+/**
+ * options to login or create an account
+ * on successful login navigates to the main app and adds the received authentication token to the API
+ * @param viewModel user view model
+ * @param context application context
+ * @param navController navigation
+ * @param routeViewModel route view model
+ */
 @Composable
 fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController, routeViewModel: RouteViewModel) {
     var usernameAttempt by remember { mutableStateOf("")}

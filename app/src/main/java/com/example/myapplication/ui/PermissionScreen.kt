@@ -15,6 +15,14 @@ import com.example.myapplication.RouteViewModel
 import com.example.myapplication.UserViewModel
 import com.example.myapplication.checkPermissions
 
+/**
+ * Screen that launches various permissions (should be shown briefly, if at all)
+ * @param singlePermission launcher for one permission
+ * @param multiplePermission launcher for multiple permissions
+ * @param viewModel route view model
+ * @param context application context
+ * @param navController navigation
+ */
 @Composable
 fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
                      multiplePermission: ActivityResultLauncher<Array<String>>,

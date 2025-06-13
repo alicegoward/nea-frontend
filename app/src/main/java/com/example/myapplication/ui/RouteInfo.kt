@@ -35,6 +35,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * displays information about the route, with options to modify for the admin
+ * @param route information about the route
+ * @param viewModel user view model
+ * @param navController navigation
+ */
 @Composable
 fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavController) {
     outerScaffold(navController, viewModel) {
@@ -89,11 +95,24 @@ fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavCont
     }
 }
 
+/**
+ * stores data for each individual configuration choice the user can make
+ * @param question question for the user to answer
+ * @param options possible options
+ * @param initialState default (or previously selected) option
+ */
 class Choice(private val question: String, private val options: List<String>, private val initialState: String) {
     lateinit var selected: MutableState<String>
+
+    /**
+     * required as constructor cannot be composable
+     */
     @Composable
     fun init() { selected = remember { mutableStateOf(initialState) } }
 
+    /**
+     * displays the choice and stores the value when it changes
+     */
     @Composable
     fun display() {
         Text(question)
@@ -109,67 +128,80 @@ class Choice(private val question: String, private val options: List<String>, pr
     }
 }
 
+/**
+ * displays options for the user's meet on route / notification settings
+ * @param viewModel route view model
+ * @param routeName name of route
+ * @param navController navigation
+ */
 @Composable
-fun IndividualConfig(viewModel: RouteViewModel, route_name: String, navController: NavController) {
-    val route = viewModel.routes.find {it.name == route_name}!!
+fun IndividualConfig(viewModel: RouteViewModel, routeName: String, navController: NavController) {
+    val route = viewModel.routes.find {it.name == routeName}!!
     outerScaffold(navController, viewModel) {
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(60.dp)) {
-            val create_meet_on_route = Choice(
+            val createMeetOnRoute = Choice(
                 "Auto create meet on route?",
                 listOf("Yes", "No"),
                 route.create_mor
             ).apply { init() }
-            val meet_on_route_tolerance = Choice(
+            val meetOnRouteTolerance = Choice(
                 "Maximum detour + wait time for meet on route:",
                 listOf(1, 2, 5, 10).map { i -> "$i minutes" },
                 route.mor_tolerance_s
             ).apply { init() }
-            val reroute_tolerance = Choice(
+            val rerouteTolerance = Choice(
                 "How many metres before rerouting if you go off course?",
                 listOf(20, 50, 100, 200).map { i -> "$i m" },
                 route.reroute_tolerance_m
             ).apply { init() }
-            val auto_notify_late = Choice(
+            val autoNotifyLate = Choice(
                 "After you are late by how much should everyone else be notified?",
                 listOf(2, 5, 10, 20).map { i -> "$i minutes" },
                 route.auto_notify_late
             ).apply { init() }
 
-            create_meet_on_route.display()
-            if (create_meet_on_route.selected.value == "Yes") {
-                meet_on_route_tolerance.display()
+            createMeetOnRoute.display()
+            if (createMeetOnRoute.selected.value == "Yes") {
+                meetOnRouteTolerance.display()
             }
-            reroute_tolerance.display()
-            auto_notify_late.display()
+            rerouteTolerance.display()
+            autoNotifyLate.display()
             Spacer(Modifier.weight(1F))
             Row {
                 Button(
                     content = { Text("save and go back") },
                     onClick = {
-                        route.create_mor = create_meet_on_route.selected.value
-                        route.mor_tolerance_s = meet_on_route_tolerance.selected.value
-                        route.reroute_tolerance_m = reroute_tolerance.selected.value
+                        route.create_mor = createMeetOnRoute.selected.value
+                        route.mor_tolerance_s = meetOnRouteTolerance.selected.value
+                        route.reroute_tolerance_m = rerouteTolerance.selected.value
                         viewModel.setIndividualConfig(route)
-                        navController.navigate("route_info/$route_name")
+                        navController.navigate("route_info/$routeName")
                     }
                 )
                 Button(
                     content = { Text("cancel") },
-                    onClick = { navController.navigate("route_info/$route_name") }
+                    onClick = { navController.navigate("route_info/$routeName") }
                 )
             }
         }
     }
 }
 
+/**
+ * wrapper for the edit participants function in create route, this time in the context of editing the route
+ * @param routeName name of route
+ * @param viewModel route view model
+ * @param navController navigation
+ * @param userViewModel user view model
+ */
 @Composable
-fun editParticipants(route_name: String, viewModel: RouteViewModel, navController: NavController, userViewModel: UserViewModel) {
+fun editParticipants(routeName: String, viewModel: RouteViewModel, navController: NavController, userViewModel: UserViewModel) {
     var route: RouteInfo? = null
-    for (possible_route in viewModel.routes) {
-        if (possible_route.name == route_name) route = possible_route
+    for (possibleRoute in viewModel.routes) {
+        if (possibleRoute.name == routeName) route = possibleRoute
     }
     viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
     viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
@@ -181,19 +213,19 @@ fun editParticipants(route_name: String, viewModel: RouteViewModel, navControlle
                 Button(
                     content = { Text("Save") },
                     onClick = {
-                        val out = hashMapOf("route" to route_name)
+                        val out = hashMapOf("route" to routeName)
                         viewModel.routeCreation.friends.forEachIndexed { idx, item ->
                             out[idx.toString()] = item
                         }
                         viewModel.updateRouteInfo(out)
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
                 Spacer(Modifier.weight(1F))
                 Button(
                     content = { Text("Cancel") },
                     onClick = {
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
             }
@@ -201,11 +233,17 @@ fun editParticipants(route_name: String, viewModel: RouteViewModel, navControlle
     }
 }
 
+/**
+ * wrapper for the edit time function in create route, this time in the context of editing the route
+ * @param routeName name of route
+ * @param viewModel route view model
+ * @param navController navigation
+ */
 @Composable
-fun editTime(route_name: String, viewModel: RouteViewModel, navController: NavController) {
+fun editTime(routeName: String, viewModel: RouteViewModel, navController: NavController) {
     var route: RouteInfo? = null
-    for (possible_route in viewModel.routes) {
-        if (possible_route.name == route_name) route = possible_route
+    for (possibleRoute in viewModel.routes) {
+        if (possibleRoute.name == routeName) route = possibleRoute
     }
     viewModel.routeCreation = Route(viewModel.position)
     viewModel.routeCreation.endTime = route!!.end_time.toInt()
@@ -224,17 +262,17 @@ fun editTime(route_name: String, viewModel: RouteViewModel, navController: NavCo
                         viewModel.updateRouteInfo(
                             mapOf(
                                 "time" to (viewModel.routeCreation.endDate!! + viewModel.routeCreation.endTime!!).toString(),
-                                "route" to route_name
+                                "route" to routeName
                             )
                         )
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
                 Spacer(Modifier.weight(1F))
                 Button(
                     content = { Text("Cancel") },
                     onClick = {
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
             }
@@ -242,11 +280,18 @@ fun editTime(route_name: String, viewModel: RouteViewModel, navController: NavCo
     }
 }
 
+/**
+ * wrapper for the edit position function in create route, this time in the context of editing the route
+ * @param routeName name of route
+ * @param context application context
+ * @param viewModel route view model
+ * @param navController navigation
+ */
 @Composable
-fun editPosition(route_name: String, context: Context, viewModel: RouteViewModel, navController: NavController) {
+fun editPosition(routeName: String, context: Context, viewModel: RouteViewModel, navController: NavController) {
     var route: RouteInfo? = null
-    for (possible_route in viewModel.routes) {
-        if (possible_route.name == route_name) route = possible_route
+    for (possibleRoute in viewModel.routes) {
+        if (possibleRoute.name == routeName) route = possibleRoute
     }
     viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
     outerScaffold(navController, viewModel) {
@@ -261,17 +306,17 @@ fun editPosition(route_name: String, context: Context, viewModel: RouteViewModel
                             mapOf(
                                 "lat" to viewModel.routeCreation.endLocation.latitude.toString(),
                                 "long" to viewModel.routeCreation.endLocation.longitude.toString(),
-                                "route" to route_name
+                                "route" to routeName
                             )
                         )
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
                 Spacer(Modifier.weight(1F))
                 Button(
                     content = { Text("Cancel") },
                     onClick = {
-                        navController.navigate("route_info/${route_name}")
+                        navController.navigate("route_info/${routeName}")
                     }
                 )
             }

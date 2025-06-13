@@ -13,7 +13,14 @@ import com.example.myapplication.RouteViewModel
 import com.example.myapplication.UserViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
-
+/**
+ * navigation between the various screens
+ * @param context application context
+ * @param userViewModel user view model
+ * @param routeViewModel route view model
+ * @param singlePermission launcher for a single permission
+ * @param multiplePermission launcher for multiple permissions
+ */
 @Composable
 fun Navigation(context: Context,
                userViewModel: UserViewModel,

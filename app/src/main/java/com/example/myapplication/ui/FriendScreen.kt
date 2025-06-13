@@ -31,12 +31,18 @@ import com.example.myapplication.AppDatabase
 import com.example.myapplication.UserViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Displays all incoming / outgoing / full friends
+ * Options to accept or decline incoming friend requests and send requests to others
+ * @param viewModel user view model
+ * @param navController navigation
+ * @param context application context
+ */
 @Composable
 fun FriendScreen(viewModel: UserViewModel, navController: NavController, context: Context) {
     var currentFriend by remember {mutableStateOf("")}
     val coroutineScope = rememberCoroutineScope()
     outerScaffold(navController, viewModel) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End

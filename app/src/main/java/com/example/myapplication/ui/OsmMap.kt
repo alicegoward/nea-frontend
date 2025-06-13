@@ -11,10 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +32,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
+/**
+ * Displays a map with overlays for current location and data about active route (if relevant)
+ * @param viewModel route view model
+ * @param context application context
+ * @param navController navigation
+ */
 @Composable
 fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: NavController) {
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
