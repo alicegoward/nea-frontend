@@ -25,9 +25,9 @@ class RouteViewModel: MainViewModel() {
     var routeCreation = Route(this.position)
     var routes: List<RouteInfo> by mutableStateOf(emptyList())
     var routePoints by mutableStateOf(emptyList<GeoPoint>())
-    private var route_dist: Double? by mutableStateOf(null)
+    private var routeDist: Double? by mutableStateOf(null)
     var itineraries: MutableCollection<Itinerary>? by mutableStateOf(null)
-    var other_routes by mutableStateOf(HashMap<String, List<GeoPoint>>())
+    var otherRoutes by mutableStateOf(HashMap<String, List<GeoPoint>>())
     var waypoints: List<GeoPoint> by mutableStateOf(emptyList())
     var activeRoute: RouteInfo? by mutableStateOf(null)
     var permissionsDone by mutableStateOf(false)
@@ -77,11 +77,11 @@ class RouteViewModel: MainViewModel() {
                 )).body()
                 routePoints = route_data!!.geometry.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                 route_data.other_paths.forEach { (user, path) ->
-                    other_routes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
+                    otherRoutes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                 }
                 waypoints = route_data.waypoints.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
-                Log.d("other routes", other_routes.toString())
-                route_dist = route_data.dist
+                Log.d("other routes", otherRoutes.toString())
+                routeDist = route_data.dist
                 itineraries = route_data.itineraries.values.toMutableList()
                 activeRoute = route
             }
@@ -108,10 +108,10 @@ class RouteViewModel: MainViewModel() {
         getData {
             mainAPI.setIndividualConfig(ConfigData(
                 route.name,
-                route.create_mor == "Yes",
-                route.mor_tolerance_s.takeWhile { it.isDigit() }.toDouble() * 60,
-                route.reroute_tolerance_m.takeWhile { it.isDigit() }.toDouble(),
-                route.auto_notify_late.takeWhile { it.isDigit() }.toDouble() * 60,
+                route.createMOR == "Yes",
+                route.morToleranceS.takeWhile { it.isDigit() }.toDouble() * 60,
+                route.rerouteToleranceM.takeWhile { it.isDigit() }.toDouble(),
+                route.autoNotifyLate.takeWhile { it.isDigit() }.toDouble() * 60,
 
                 ))
             getIndividualConfig(route)
@@ -125,10 +125,10 @@ class RouteViewModel: MainViewModel() {
     fun getIndividualConfig(route: RouteInfo) {
         getData {
             val config = mainAPI.getIndividualConfig(UserOnRoute(route.name)).body()
-            route.create_mor = if (config!!.create_mor) "Yes" else "No"
-            route.mor_tolerance_s = "${(config.mor_tolerance_s/60).toInt()} minutes"
-            route.reroute_tolerance_m = "${config.reroute_tolerance_m.toInt()} m"
-            route.auto_notify_late = "${(config.auto_notify_late/60).toInt()} minutes"
+            route.createMOR = if (config!!.create_mor) "Yes" else "No"
+            route.morToleranceS = "${(config.mor_tolerance_s/60).toInt()} minutes"
+            route.rerouteToleranceM = "${config.reroute_tolerance_m.toInt()} m"
+            route.autoNotifyLate = "${(config.auto_notify_late/60).toInt()} minutes"
         }
     }
 
@@ -152,11 +152,11 @@ class RouteViewModel: MainViewModel() {
                         if (route_data != null) {
                             routePoints = route_data.geometry.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             route_data.other_paths.forEach { (user, path) ->
-                                other_routes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
+                                otherRoutes[user] = path.toSortedMap().values.map { GeoPoint(it.lat, it.long) }
                             }
                             Log.d("stuff", route_data.toString())
                             waypoints = route_data.waypoints.values.toList().map { GeoPoint(it.lat, it.long) }
-                            route_dist = route_data.dist
+                            routeDist = route_data.dist
                             itineraries = route_data.itineraries.values.toMutableList()
                         }
                     }

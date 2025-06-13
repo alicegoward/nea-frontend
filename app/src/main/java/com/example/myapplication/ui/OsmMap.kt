@@ -69,8 +69,8 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
                     }
                     mapView.overlays.clear()
                     mapView.overlays.add(location)
-                    Log.d("route geometry size", viewModel.other_routes.size.toString())
-                    viewModel.other_routes.forEach {
+                    Log.d("route geometry size", viewModel.otherRoutes.size.toString())
+                    viewModel.otherRoutes.forEach {
                         Log.d("route geometry maybe", it.value.toString())
                         mapView.overlays.add(Polyline().apply {
                             setPoints(it.value)

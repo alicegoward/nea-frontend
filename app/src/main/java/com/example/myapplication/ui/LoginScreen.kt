@@ -64,14 +64,14 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
     Column {
         Row(modifier = Modifier.fillMaxWidth().height(100.dp)) {
             FilledTonalButton (
-                onClick = { viewModel.create_account = false },
+                onClick = { viewModel.createAccount = false },
                 Modifier.weight(1F).fillMaxHeight(),
                 shape = RoundedCornerShape(0.dp)
             ) {
                 Text("Login", Modifier.align(Alignment.Bottom).padding(10.dp), fontSize = 16.sp)
             }
             FilledTonalButton (
-                onClick = { viewModel.create_account = true },
+                onClick = { viewModel.createAccount = true },
                 Modifier.weight(1F).fillMaxHeight(),
                 shape = RoundedCornerShape(0.dp)
             ) {
@@ -99,21 +99,21 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
         Button(
             modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(50.dp),
             onClick = {
-                if (viewModel.create_account) {
+                if (viewModel.createAccount) {
                     viewModel.createUser(usernameAttempt, passwordAttempt)
                 } else {
                     viewModel.loginUser(usernameAttempt, passwordAttempt)
                 }
             },
         ) {
-            if (viewModel.create_account) {
+            if (viewModel.createAccount) {
                 Text("Create account", fontSize = 16.sp)
             } else {
                 Text("Login", fontSize = 16.sp)
             }
         }
-        if (viewModel.error_text != null) {
-            Text(viewModel.error_text!!, Modifier.align(Alignment.CenterHorizontally))
+        if (viewModel.errorText != null) {
+            Text(viewModel.errorText!!, Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }

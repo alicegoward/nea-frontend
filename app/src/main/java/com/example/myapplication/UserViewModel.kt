@@ -10,10 +10,10 @@ import androidx.compose.runtime.setValue
  */
 class UserViewModel: MainViewModel() {
     var friends: MutableCollection<String>? by mutableStateOf(null)
-    var outgoing_requests: MutableCollection<String>? by mutableStateOf(null)
-    var pending_requests: MutableCollection<String>? by mutableStateOf(null)
-    var create_account by mutableStateOf(false)
-    var error_add_friend: String? by mutableStateOf(null)
+    var outgoingRequests: MutableCollection<String>? by mutableStateOf(null)
+    var pendingRequests: MutableCollection<String>? by mutableStateOf(null)
+    var createAccount by mutableStateOf(false)
+    var errorAddFriend: String? by mutableStateOf(null)
 
     /**
      * Gets the user's list of incoming, outgoing and full friends
@@ -24,8 +24,8 @@ class UserViewModel: MainViewModel() {
                 val data = mainAPI.getFriends().body()
                 Log.d("maybe some data", data.toString())
                 friends = data?.names?.values
-                pending_requests = data?.incoming?.values
-                outgoing_requests = data?.outgoing?.values
+                pendingRequests = data?.incoming?.values
+                outgoingRequests = data?.outgoing?.values
             }
         }
     }
@@ -34,7 +34,7 @@ class UserViewModel: MainViewModel() {
      * @param request user's request to update the status for
      * @param state whether the request has been accepted or declined
      */
-    fun update_request(request: String, state: String) {
+    fun updateRequest(request: String, state: String) {
         getData {
             mainAPI.updateRequest(UpdateRequest(user!!, request, state))
             this@UserViewModel.getFriends()
@@ -42,18 +42,18 @@ class UserViewModel: MainViewModel() {
     }
 
     /**
-     * @param to_add friend to send request to
+     * @param toAdd friend to send request to
      */
-    fun addFriend(to_add: String) {
+    fun addFriend(toAdd: String) {
         getData {
             val data = mainAPI.addFriend(
                 AddFriend(
                     userRequesting = user!!,
-                    userRequested = to_add
+                    userRequested = toAdd
                 )
             )
             Log.d("friend data", data.body().toString() + data.code())
-            error_add_friend = data.body()?.reason
+            errorAddFriend = data.body()?.reason
             getFriends()
         }
     }

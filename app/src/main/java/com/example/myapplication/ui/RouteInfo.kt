@@ -62,7 +62,7 @@ fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavCont
             }
             Text("Meeting details:", fontSize = 20.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(route.junction_name)
+                Text(route.junctionName)
                 if (route.admin == viewModel.user) {
                     Spacer(Modifier.weight(1f))
                     TextButton(
@@ -76,7 +76,7 @@ fun RouteInfo(route: RouteInfo, viewModel: UserViewModel, navController: NavCont
                     "When: " + SimpleDateFormat(
                         "EEEE MMMM d\n HH:mm",
                         Locale.UK
-                    ).format(Date(route.end_time * 1000))
+                    ).format(Date(route.endTime * 1000))
                 )
                 if (route.admin == viewModel.user) {
                     Spacer(Modifier.weight(1f))
@@ -145,22 +145,22 @@ fun IndividualConfig(viewModel: RouteViewModel, routeName: String, navController
             val createMeetOnRoute = Choice(
                 "Auto create meet on route?",
                 listOf("Yes", "No"),
-                route.create_mor
+                route.createMOR
             ).apply { init() }
             val meetOnRouteTolerance = Choice(
                 "Maximum detour + wait time for meet on route:",
                 listOf(1, 2, 5, 10).map { i -> "$i minutes" },
-                route.mor_tolerance_s
+                route.morToleranceS
             ).apply { init() }
             val rerouteTolerance = Choice(
                 "How many metres before rerouting if you go off course?",
                 listOf(20, 50, 100, 200).map { i -> "$i m" },
-                route.reroute_tolerance_m
+                route.rerouteToleranceM
             ).apply { init() }
             val autoNotifyLate = Choice(
                 "After you are late by how much should everyone else be notified?",
                 listOf(2, 5, 10, 20).map { i -> "$i minutes" },
-                route.auto_notify_late
+                route.autoNotifyLate
             ).apply { init() }
 
             createMeetOnRoute.display()
@@ -174,9 +174,9 @@ fun IndividualConfig(viewModel: RouteViewModel, routeName: String, navController
                 Button(
                     content = { Text("save and go back") },
                     onClick = {
-                        route.create_mor = createMeetOnRoute.selected.value
-                        route.mor_tolerance_s = meetOnRouteTolerance.selected.value
-                        route.reroute_tolerance_m = rerouteTolerance.selected.value
+                        route.createMOR = createMeetOnRoute.selected.value
+                        route.morToleranceS = meetOnRouteTolerance.selected.value
+                        route.rerouteToleranceM = rerouteTolerance.selected.value
                         viewModel.setIndividualConfig(route)
                         navController.navigate("route_info/$routeName")
                     }
@@ -203,7 +203,7 @@ fun editParticipants(routeName: String, viewModel: RouteViewModel, navController
     for (possibleRoute in viewModel.routes) {
         if (possibleRoute.name == routeName) route = possibleRoute
     }
-    viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
+    viewModel.routeCreation = Route(GeoPoint(route!!.endLat, route.endLong))
     viewModel.routeCreation.friends = mutableStateListOf<String>().apply { addAll(route.participants.values) }
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
@@ -246,7 +246,7 @@ fun editTime(routeName: String, viewModel: RouteViewModel, navController: NavCon
         if (possibleRoute.name == routeName) route = possibleRoute
     }
     viewModel.routeCreation = Route(viewModel.position)
-    viewModel.routeCreation.endTime = route!!.end_time.toInt()
+    viewModel.routeCreation.endTime = route!!.endTime.toInt()
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             chooseEndTime(viewModel)
@@ -293,7 +293,7 @@ fun editPosition(routeName: String, context: Context, viewModel: RouteViewModel,
     for (possibleRoute in viewModel.routes) {
         if (possibleRoute.name == routeName) route = possibleRoute
     }
-    viewModel.routeCreation = Route(GeoPoint(route!!.end_lat, route.end_long))
+    viewModel.routeCreation = Route(GeoPoint(route!!.endLat, route.endLong))
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
             chooseLocation(viewModel, context)

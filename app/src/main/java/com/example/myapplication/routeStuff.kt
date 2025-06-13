@@ -40,10 +40,10 @@ enum class RouteState {
 /**
  * route during creation
  */
-class Route(EndLocation: GeoPoint) {
+class Route(endLocation: GeoPoint) {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
-    var endLocation by mutableStateOf(EndLocation)
+    var endLocation by mutableStateOf(endLocation)
     var endDate: Long? = null
     var endTime: Int? = null
     var name by mutableStateOf("")
@@ -72,14 +72,14 @@ class Route(EndLocation: GeoPoint) {
  */
 data class RouteInfo(val routeData: RouteData) {
     val name = routeData.name
-    val end_lat = routeData.lat
-    val end_long = routeData.long
+    val endLat = routeData.lat
+    val endLong = routeData.long
     val admin = routeData.username
     val participants = routeData.friends
-    val end_time = routeData.endTime
-    val junction_name = routeData.junction_name
-    var create_mor by mutableStateOf("No")
-    var mor_tolerance_s by mutableStateOf("10 minutes")
-    var reroute_tolerance_m by mutableStateOf("50 m")
-    var auto_notify_late by mutableStateOf("10 minutes")
+    val endTime = routeData.endTime
+    val junctionName = routeData.junction_name
+    var createMOR by mutableStateOf("No")
+    var morToleranceS by mutableStateOf("10 minutes")
+    var rerouteToleranceM by mutableStateOf("50 m")
+    var autoNotifyLate by mutableStateOf("10 minutes")
 }

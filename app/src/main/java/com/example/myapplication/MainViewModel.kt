@@ -20,45 +20,45 @@ open class MainViewModel : ViewModel() {
     var password: String? by mutableStateOf(null)
     var mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
     var toastText by mutableStateOf("")
-    var error_text: String? by mutableStateOf(null)
+    var errorText: String? by mutableStateOf(null)
 
     /**
      * attempts to register a user, displaying an error message if unsuccessful
-     * @param to_check user to attempt registration for
+     * @param toCheck user to attempt registration for
      * @param password user's password
      */
-    fun createUser(to_check: String, password: String) {
+    fun createUser(toCheck: String, password: String) {
         getData {
-            val status = mainAPI.postUserData(UsernamePassword(to_check, password))
+            val status = mainAPI.postUserData(UsernamePassword(toCheck, password))
             Log.d("user create status", status.toString())
             if (status.code() == 200) {
-                user = to_check
+                user = toCheck
                 this.password = password
             } else {
-                error_text = status.body()?.reason
-                Log.e("create account", error_text.toString())
+                errorText = status.body()?.reason
+                Log.e("create account", errorText.toString())
             }
         }
     }
 
     /**
      * Attempt to login user, saving a token if successful and outputting an error if not
-     * @param to_check username to attempt to login with
+     * @param toCheck username to attempt to login with
      * @param password password to attempt to login with
      */
-    fun loginUser(to_check: String, password: String) {
+    fun loginUser(toCheck: String, password: String) {
         getData {
-            val user_data = mainAPI.loginUser(UsernamePassword(to_check, password))
-            Log.d("data", user_data.body().toString())
-            if (user_data.code() == 200) {
-                TokenManager.token = user_data.body()!!.token
+            val userData = mainAPI.loginUser(UsernamePassword(toCheck, password))
+            Log.d("data", userData.body().toString())
+            if (userData.code() == 200) {
+                TokenManager.token = userData.body()!!.token
                 mainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
-                user = to_check
+                user = toCheck
                 this.password = password
                 Log.d("user", user.toString())
             } else {
-                error_text = user_data.body()?.reason
-                Log.e("login", error_text.toString())
+                errorText = userData.body()?.reason
+                Log.e("login", errorText.toString())
             }
         }
     }

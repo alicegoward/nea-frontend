@@ -68,17 +68,17 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
                 .verticalScroll(rememberScrollState()),
         ) {
             Text("Friend requests", fontSize = 20.sp)
-            if (viewModel.pending_requests != null) {
-                for (request: String in viewModel.pending_requests!!) {
+            if (viewModel.pendingRequests != null) {
+                for (request: String in viewModel.pendingRequests!!) {
                     Row(Modifier.fillMaxWidth(),  verticalAlignment = Alignment.CenterVertically) {
                         Text(request)
                         Spacer(modifier = Modifier.weight(1F))
                         TextButton (
-                            onClick = { viewModel.update_request(request, "accepted") },
+                            onClick = { viewModel.updateRequest(request, "accepted") },
                             content = { Text("Accept") }
                         )
                         TextButton (
-                            onClick = { viewModel.update_request(request, "declined") },
+                            onClick = { viewModel.updateRequest(request, "declined") },
                             content = { Text("Decline") }
                         )
                     }
@@ -86,8 +86,8 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
             }
             Spacer(Modifier.height(20.dp))
             Text("Outgoing requests", fontSize = 20.sp)
-            if (viewModel.outgoing_requests != null) {
-                for (request: String in viewModel.outgoing_requests!!) {
+            if (viewModel.outgoingRequests != null) {
+                for (request: String in viewModel.outgoingRequests!!) {
                     Row { Text(request) }
                 }
             }
@@ -107,8 +107,8 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
                     content = { Text("Send request") }
                 )
             }
-            if (viewModel.error_add_friend != null) {
-                Text(viewModel.error_add_friend!!)
+            if (viewModel.errorAddFriend != null) {
+                Text(viewModel.errorAddFriend!!)
             } else {
                 Text("")
             }
