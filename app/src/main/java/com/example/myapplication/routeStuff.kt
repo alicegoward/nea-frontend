@@ -44,8 +44,8 @@ class Route(endLocation: GeoPoint) {
     var state by mutableStateOf(RouteState.START)
     var friends = mutableStateListOf<String>()
     var endLocation by mutableStateOf(endLocation)
-    var endDate: Long? = null
-    var endTime: Int? = null
+    var endDate: Long = java.time.Instant.now().epochSecond
+    var endTime: Int = 0
     var name by mutableStateOf("")
 
     /**
@@ -56,7 +56,7 @@ class Route(endLocation: GeoPoint) {
         val friendDict = HashMap<Int, String>()
         friends.forEachIndexed {idx, item -> friendDict[idx] = item}
         return RouteData(
-            endTime = endDate!! + endTime!!,
+            endTime = endDate + endTime,
             lat = endLocation.latitude,
             long = endLocation.longitude,
             friends = friendDict,

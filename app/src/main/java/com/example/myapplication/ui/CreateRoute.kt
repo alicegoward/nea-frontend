@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,10 +61,13 @@ import java.util.Calendar
 @Composable
 fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context: Context, navController: NavController) {
     displaySnackbar(viewModel)
+    if (viewModel.routeCreation.state == RouteState.CHOOSE_LOCATION) {
+        displayMap(viewModel, context)
+    }
     Column(Modifier.padding(60.dp)) {
         when (viewModel.routeCreation.state) {
             RouteState.START -> start(viewModel, userViewModel, true)
-            RouteState.CHOOSE_LOCATION -> chooseLocation(viewModel, context)
+            RouteState.CHOOSE_LOCATION -> chooseLocation()
             RouteState.CHOOSE_END_TIME -> chooseEndTime(viewModel)
             RouteState.END -> end(viewModel, navController)
         }
@@ -142,6 +146,7 @@ fun end(viewModel: RouteViewModel, navController: NavController) {
 fun chooseEndTime(viewModel: RouteViewModel) {
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var dialogConfirmed by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState(
         initialHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
@@ -172,7 +177,7 @@ fun chooseEndTime(viewModel: RouteViewModel) {
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.routeCreation.endDate = datePickerState.selectedDateMillis?.div(1000)
+                    dialogConfirmed = true
                     showDatePicker = false
                 }) {
                     Text("OK")
@@ -216,83 +221,104 @@ fun chooseEndTime(viewModel: RouteViewModel) {
             }
         }
     }
+    LaunchedEffect(dialogConfirmed) {
+        if (dialogConfirmed) {
+            datePickerState.selectedDateMillis?.let {
+                viewModel.routeCreation.endDate = it / 1000
+            }
+            dialogConfirmed = false
+        }
+    }
 }
 
 /**
  * choose location screen - move the map until the pin is over the desired location
+ * Not in a column due to rendering issues
  * @param viewModel route view model
  * @param context application context
  */
 @Composable
-fun chooseLocation(viewModel: RouteViewModel, context: Context) {
-    Column(Modifier.fillMaxSize(0.75f)) {
-        Text("Select end destination", Modifier.padding(20.dp), fontSize = 20.sp)
-        Spacer(Modifier.weight(1f))
-        AndroidView(
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth(),
-            factory = {
-                MapView(it).apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setMultiTouchControls(true)
-                    controller.setCenter(viewModel.position)
-                    controller.setZoom(17.5)
-                }
-            },
-            update = { mapView ->
-                run {
-                    mapView.addMapListener(object : MapListener {
-                        override fun onScroll(event: ScrollEvent?): Boolean {
-                            event?.let {
-                                viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
-                            }
-                            return true
-                        }
-
-                        override fun onZoom(event: ZoomEvent?): Boolean {
-                            event?.let {
-                                viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
-                            }
-                            return true
-                        }
-                    })
-                    if (viewModel.position != GeoPoint(0.0, 0.0)) {
-                        val location = Marker(mapView).apply {
-                            position = viewModel.position
-                            setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(
-                                context,
-                                R.drawable.current_location
-                            )
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-
-                        }
-                        val endPoint = Marker(mapView).apply {
-                            position = viewModel.routeCreation.endLocation
-                            setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(
-                                context,
-                                R.drawable.end
-                            )
-                            setAnchor(Marker.ANCHOR_BOTTOM, Marker.ANCHOR_CENTER)
-                        }
-                        Log.d("location central", viewModel.routeCreation.endLocation.toString())
-                        if (mapView.overlays.isEmpty()) {
-                            mapView.overlays.add(location)
-                            mapView.overlays.add(endPoint)
-                            mapView.controller.setCenter(viewModel.position)
-                        } else {
-                            mapView.overlays[0] = location
-                            mapView.overlays[1] = endPoint
-                        }
-                        Log.d("end location", viewModel.routeCreation.endLocation.toString())
-                        mapView.invalidate()
-                    }
-                }
-
+fun displayMap(viewModel: RouteViewModel, context: Context) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxHeight(0.5F)
+            .fillMaxWidth(),
+        factory = {
+            MapView(it).apply {
+                setTileSource(TileSourceFactory.MAPNIK)
+                setMultiTouchControls(true)
+                controller.setCenter(viewModel.position)
+                controller.setZoom(17.5)
             }
-        )
-    }
+        },
+        update = { mapView ->
+            run {
+                mapView.addMapListener(object : MapListener {
+                    override fun onScroll(event: ScrollEvent?): Boolean {
+                        event?.let {
+                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
+                        }
+                        return true
+                    }
 
+                    override fun onZoom(event: ZoomEvent?): Boolean {
+                        event?.let {
+                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
+                        }
+                        return true
+                    }
+                })
+                if (viewModel.position != GeoPoint(0.0, 0.0)) {
+                    val location = Marker(mapView).apply {
+                        position = viewModel.position
+                        setInfoWindow(null)
+                        icon = ContextCompat.getDrawable(
+                            context,
+                            R.drawable.current_location
+                        )
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+
+                    }
+                    val endPoint = Marker(mapView).apply {
+                        position = viewModel.routeCreation.endLocation
+                        setInfoWindow(null)
+                        icon = ContextCompat.getDrawable(
+                            context,
+                            R.drawable.end
+                        )
+                        setAnchor(Marker.ANCHOR_BOTTOM, Marker.ANCHOR_CENTER)
+                    }
+                    Log.d("location central", viewModel.routeCreation.endLocation.toString())
+                    if (mapView.overlays.isEmpty()) {
+                        mapView.overlays.add(location)
+                        mapView.overlays.add(endPoint)
+                        mapView.controller.setCenter(viewModel.position)
+                    } else {
+                        mapView.overlays[0] = location
+                        mapView.overlays[1] = endPoint
+                    }
+                    Log.d("end location", viewModel.routeCreation.endLocation.toString())
+                    mapView.invalidate()
+                }
+            }
+
+        }
+    )
+}
+
+/**
+ * Supporting text for the map view
+ */
+@Composable
+fun chooseLocation() {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(500.dp))
+        Text("Select end destination", fontSize = 20.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+    }
 }

@@ -256,12 +256,13 @@ fun editTime(routeName: String, viewModel: RouteViewModel, navController: NavCon
                     content = { Text("Save") },
                     onClick = {
                         Log.d(
-                            viewModel.routeCreation.endDate.toString(),
+                            "attempting to update time",
+                            viewModel.routeCreation.endDate.toString()+" "+
                             viewModel.routeCreation.endTime.toString()
                         )
                         viewModel.updateRouteInfo(
-                            mapOf(
-                                "time" to (viewModel.routeCreation.endDate!! + viewModel.routeCreation.endTime!!).toString(),
+                            hashMapOf(
+                                "time" to (viewModel.routeCreation.endDate + viewModel.routeCreation.endTime).toString(),
                                 "route" to routeName
                             )
                         )
@@ -294,16 +295,17 @@ fun editPosition(routeName: String, context: Context, viewModel: RouteViewModel,
         if (possibleRoute.name == routeName) route = possibleRoute
     }
     viewModel.routeCreation = Route(GeoPoint(route!!.endLat, route.endLong))
+    displayMap(viewModel, context)
     outerScaffold(navController, viewModel) {
         Column(modifier = Modifier.padding(60.dp)) {
-            chooseLocation(viewModel, context)
+            chooseLocation()
             Spacer(Modifier.weight(1F))
             Row {
                 Button(
                     content = { Text("Save") },
                     onClick = {
                         viewModel.updateRouteInfo(
-                            mapOf(
+                            hashMapOf(
                                 "lat" to viewModel.routeCreation.endLocation.latitude.toString(),
                                 "long" to viewModel.routeCreation.endLocation.longitude.toString(),
                                 "route" to routeName
