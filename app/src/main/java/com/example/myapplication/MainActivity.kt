@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions(false, singlePermission, multiplePermission, this, routeViewModel)
         enableEdgeToEdge()
-        startService(Intent(this, NotificationService::class.java))
         setContent{
             Navigation(this, userViewModel, routeViewModel, singlePermission, multiplePermission)
         }

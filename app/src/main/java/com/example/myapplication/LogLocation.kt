@@ -36,7 +36,7 @@ class LogLocation: Service() {
      * Creates a notification to display to the user that location is being recorded
      */
     @SuppressLint("MissingPermission")
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val name = "location"
         val importance = NotificationManager.IMPORTANCE_LOW
         val channel = NotificationChannel("location", name, importance)

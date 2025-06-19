@@ -50,7 +50,6 @@ class NotificationService : Service() {
                             RetrofitHelper.getInstance().create(MainAPI::class.java)
                         val data = mainAPI.getNotificationData().body()?.notifications
                         data?.forEach { entry ->
-                            Log.d("notification", entry.value)
                             notificationManager.notify(
                                 Random.nextInt(0, 1000),
                                 builder.setContentText(entry.value).build()

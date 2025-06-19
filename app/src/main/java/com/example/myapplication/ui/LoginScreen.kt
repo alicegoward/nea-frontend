@@ -1,6 +1,7 @@
 package com.example.myapplication.ui
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.AppDatabase
+import com.example.myapplication.NotificationService
 import com.example.myapplication.RouteViewModel
 import com.example.myapplication.User
 import com.example.myapplication.UserViewModel
@@ -57,6 +59,7 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
             routeViewModel.user = viewModel.user
             userDao.deleteUser()
             userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
+            context.startService(Intent(context, NotificationService::class.java))
             navController.navigate("mapScreen")
         }
     }
