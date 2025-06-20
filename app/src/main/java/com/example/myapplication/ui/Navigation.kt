@@ -112,11 +112,13 @@ fun Navigation(context: Context,
                             routeInfo = i
                         }
                     }
-                    RouteInfo(
-                        routeInfo!!,
-                        userViewModel,
-                        navController,
-                    )
+                    if (routeInfo != null) {
+                        RouteInfo(
+                            routeInfo,
+                            userViewModel,
+                            navController,
+                        )
+                    }
                 }
                 composable("create_route") {
                     CreateRoute(
