@@ -66,4 +66,10 @@ class UserViewModel: MainViewModel() {
         password = null
         friends = null
     }
+
+    fun deleteRoute(name: String) {
+        getData {
+            mainAPI.deleteRoute(UserOnRoute(name))
+        }
+    }
 }

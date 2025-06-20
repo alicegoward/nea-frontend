@@ -45,6 +45,9 @@ interface MainAPI {
     @POST("route/update")
     suspend fun updateRoute(@Body updateRoute: Map<String, String>): Response<Success>
 
+    @POST("route/delete")
+    suspend fun deleteRoute(@Body userOnRoute: UserOnRoute): Response<Success>
+
     @POST("route/get_individual_config")
     suspend fun getIndividualConfig(@Body userOnRoute: UserOnRoute): Response<ConfigData>
 
