@@ -77,6 +77,7 @@ open class MainViewModel : ViewModel() {
             } catch (e: SocketTimeoutException) {
                 toastText = "Network Error"
             } catch (e: Exception) {
+                Log.d("error", e.toString())
                 toastText = "Unknown Error"
             }
             Log.d("toast", toastText)

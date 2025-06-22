@@ -139,9 +139,13 @@ class RouteViewModel: MainViewModel() {
     @SuppressLint("MissingPermission")
     fun getLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
         locationCallback = object : LocationCallback() {
+            private var lastPostTime = 0L
             override fun onLocationResult(p0: LocationResult) {
-                val location = p0.locations[p0.locations.size-1]
-                if (activeRoute != null) {
+                val location = p0.lastLocation ?: return
+                val now = System.currentTimeMillis()
+                position = GeoPoint(location.latitude, location.longitude)
+                if (activeRoute != null && now - lastPostTime >= 5000) {
+                    lastPostTime = now
                     getData {
                         val route_data = mainAPI.postData(
                             LocationData(
@@ -165,7 +169,7 @@ class RouteViewModel: MainViewModel() {
 
             }
         }
-        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        val locationRequest = LocationRequest.Builder(10000).setMinUpdateIntervalMillis(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
 
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }

@@ -56,13 +56,17 @@ class LogLocation: Service() {
         notification.flags = Notification.FLAG_ONGOING_EVENT
         ServiceCompat.startForeground(this,1,notification,ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
         locationCallback = object : LocationCallback() {
+            private var lastPostTime = 0L
             /**
              * On receiving each location, sends the result to the server
              */
             override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations){
-                    Log.d("location",location.latitude.toString())
+                val location = p0.locations[p0.locations.lastIndex]
+                Log.d("location",location.latitude.toString())
+                val now = System.currentTimeMillis()
+                if (now - lastPostTime >= 5000) {
                     CoroutineScope(Dispatchers.IO).launch {
+
                         try {
                             mainAPI.postData(
                                 LocationData(
@@ -76,7 +80,7 @@ class LogLocation: Service() {
                 }
             }
         }
-        val locationRequest = LocationRequest.Builder(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        val locationRequest = LocationRequest.Builder(10000).setMinUpdateIntervalMillis(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
         val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper())
         return START_STICKY
