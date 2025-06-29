@@ -1,6 +1,5 @@
 package com.example.myapplication.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +22,17 @@ import com.example.myapplication.MainViewModel
 /**
  * adds navigation between the three main screens - calls the UI in the box
  * @param navController navigation
- * @param viewModel either view model (only attributes in main view model are required)
- * @param mainUI UI for the rest of the screen (must be a composable function)
+ * @param viewModel either view model (only attributes in main
+ * view model are required)
+ * @param mainUI UI for the rest of the screen (must be a
+ * composable function)
  */
 @Composable
-fun outerScaffold(navController: NavController, viewModel: MainViewModel, mainUI: @Composable () -> Unit) {
+fun outerScaffold(
+    navController: NavController,
+    viewModel: MainViewModel,
+    mainUI: @Composable () -> Unit
+) {
     displaySnackbar(viewModel)
     Column {
         Box(
@@ -38,24 +43,37 @@ fun outerScaffold(navController: NavController, viewModel: MainViewModel, mainUI
             mainUI()
         }
         Box(
-            Modifier.fillMaxWidth()) {
-            Row(Modifier.height(75.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Modifier.fillMaxWidth()
+        ) {
+            Row(
+                Modifier.height(75.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 Button(
                     content = { Text("Friends") },
-                    onClick = { navController.navigate("friendScreen") },
-                    modifier = Modifier.weight(1F).fillMaxSize(),
+                    onClick = { navController.navigate(
+                        "friendScreen") },
+                    modifier = Modifier
+                        .weight(1F)
+                        .fillMaxSize(),
                     shape = RoundedCornerShape(0.dp)
                 )
-                Button (
+                Button(
                     content = { Text("Map") },
-                    onClick = { navController.navigate("mapScreen") },
-                    modifier = Modifier.weight(1F).fillMaxSize(),
+                    onClick = { navController.navigate(
+                        "mapScreen") },
+                    modifier = Modifier
+                        .weight(1F)
+                        .fillMaxSize(),
                     shape = RoundedCornerShape(0.dp)
                 )
                 Button(
                     content = { Text("Routes") },
-                    onClick = { navController.navigate("routeManagerScreen") },
-                    modifier = Modifier.weight(1F).fillMaxSize(),
+                    onClick = { navController.navigate(
+                        "routeManagerScreen") },
+                    modifier = Modifier
+                        .weight(1F)
+                        .fillMaxSize(),
                     shape = RoundedCornerShape(0.dp)
                 )
             }
@@ -72,7 +90,6 @@ fun outerScaffold(navController: NavController, viewModel: MainViewModel, mainUI
 fun displaySnackbar(viewModel: MainViewModel) {
     if (viewModel.toastText != "") {
         Box(Modifier.fillMaxSize()) {
-            Log.d("displaying snackbar", viewModel.toastText)
             Snackbar(Modifier.align(Alignment.BottomCenter)) {
                 Text(viewModel.toastText, Modifier.padding(12.dp))
             }

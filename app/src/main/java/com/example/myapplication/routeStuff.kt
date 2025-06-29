@@ -54,7 +54,7 @@ class Route(endLocation: GeoPoint) {
      */
     fun toRouteModel(username: String): RouteData {
         val friendDict = HashMap<Int, String>()
-        friends.forEachIndexed {idx, item -> friendDict[idx] = item}
+        friends.forEachIndexed { idx, item -> friendDict[idx] = item }
         return RouteData(
             endTime = endDate + endTime,
             lat = endLocation.latitude,

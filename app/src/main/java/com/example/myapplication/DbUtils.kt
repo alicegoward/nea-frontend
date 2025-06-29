@@ -15,12 +15,13 @@ import java.util.UUID
 
 /**
  * Stores persisted login details about the user
- * @param id: Automatically generated primary key (due to concurrent queries username cannot be guaranteed unique)
+ * @param id: Automatically generated primary key (due to concurrent
+ * queries username cannot be guaranteed unique)
  * @param username: Person's username
  * @param password: Person's password
  */
 @Entity
-data class User (
+data class User(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val username: String,
     val password: String
@@ -31,7 +32,7 @@ data class User (
  * @param username: Person's username
  * @param password: Person's password
  */
-data class Credentials (
+data class Credentials(
     val username: String,
     val password: String
 )
@@ -75,14 +76,20 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         private var INSTANCE: AppDatabase? = null
+
         /**
-         * Follows the singleton pattern to get an instance of the app database
+         * Follows the singleton pattern to get an instance of the app
+         * database
          * @param context: THe application context
          * @return the instance of the app database
          */
         fun getInstance(context: Context): AppDatabase {
             if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(context, AppDatabase::class.java, "db").fallbackToDestructiveMigration().build()
+                INSTANCE = Room.databaseBuilder(
+                    context,
+                    AppDatabase::class.java,
+                    "db"
+                ).fallbackToDestructiveMigration().build()
             }
             return INSTANCE!!
         }

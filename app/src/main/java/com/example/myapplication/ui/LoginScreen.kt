@@ -33,23 +33,32 @@ import com.example.myapplication.UserViewModel
 
 /**
  * options to login or create an account
- * on successful login navigates to the main app and adds the received authentication token to the API
+ * on successful login navigates to the main app and adds the
+ * received authentication token to the API
  * @param viewModel user view model
  * @param context application context
  * @param navController navigation
  * @param routeViewModel route view model
  */
 @Composable
-fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavController, routeViewModel: RouteViewModel) {
-    var usernameAttempt by remember { mutableStateOf("")}
-    var passwordAttempt by remember { mutableStateOf("")}
+fun LoginScreen(
+    viewModel: UserViewModel,
+    context: Context,
+    navController: NavController,
+    routeViewModel: RouteViewModel
+) {
+    var usernameAttempt by remember { mutableStateOf("") }
+    var passwordAttempt by remember { mutableStateOf("") }
     val db = AppDatabase.getInstance(context)
     val userDao = db.UserDao()
 
     LaunchedEffect(Unit) {
         val credentials = userDao.getUserPass()
         if (credentials.isNotEmpty()) {
-            viewModel.loginUser(credentials[0].username, credentials[0].password)
+            viewModel.loginUser(
+                credentials[0].username,
+                credentials[0].password
+            )
         }
     }
 
@@ -58,34 +67,64 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
             routeViewModel.mainAPI = viewModel.mainAPI
             routeViewModel.user = viewModel.user
             userDao.deleteUser()
-            userDao.insertUser(User(username = viewModel.user!!, password = viewModel.password!!))
-            context.startService(Intent(context, NotificationService::class.java))
+            userDao.insertUser(
+                User(
+                    username = viewModel.user!!,
+                    password = viewModel.password!!
+                )
+            )
+            context.startService(
+                Intent(
+                    context,
+                    NotificationService::class.java
+                )
+            )
             navController.navigate("mapScreen")
         }
     }
     displaySnackbar(viewModel)
     Column {
-        Row(modifier = Modifier.fillMaxWidth().height(100.dp)) {
-            FilledTonalButton (
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)) {
+            FilledTonalButton(
                 onClick = { viewModel.createAccount = false },
-                Modifier.weight(1F).fillMaxHeight(),
+                Modifier
+                    .weight(1F)
+                    .fillMaxHeight(),
                 shape = RoundedCornerShape(0.dp)
             ) {
-                Text("Login", Modifier.align(Alignment.Bottom).padding(10.dp), fontSize = 16.sp)
+                Text(
+                    "Login",
+                    Modifier
+                        .align(Alignment.Bottom)
+                        .padding(10.dp),
+                    fontSize = 16.sp
+                )
             }
-            FilledTonalButton (
+            FilledTonalButton(
                 onClick = { viewModel.createAccount = true },
-                Modifier.weight(1F).fillMaxHeight(),
+                Modifier
+                    .weight(1F)
+                    .fillMaxHeight(),
                 shape = RoundedCornerShape(0.dp)
             ) {
-                Text("Create account",Modifier.align(Alignment.Bottom).padding(10.dp), fontSize = 16.sp)
+                Text(
+                    "Create account",
+                    Modifier
+                        .align(Alignment.Bottom)
+                        .padding(10.dp),
+                    fontSize = 16.sp
+                )
             }
         }
         Spacer(Modifier.height(30.dp))
         Text("Username", Modifier.padding(horizontal = 50.dp))
         Spacer(Modifier.height(5.dp))
         TextField(
-            modifier = Modifier.padding(horizontal = 50.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 50.dp)
+                .fillMaxWidth(),
             value = usernameAttempt,
             onValueChange = { usernameAttempt = it },
             label = { Text("Username") },
@@ -94,13 +133,18 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
         Text("Password", Modifier.padding(horizontal = 50.dp))
         Spacer(Modifier.height(5.dp))
         TextField(
-            modifier = Modifier.padding(horizontal = 50.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 50.dp)
+                .fillMaxWidth(),
             value = passwordAttempt,
             onValueChange = { passwordAttempt = it },
             label = { Text("Password") },
         )
         Button(
-            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().padding(50.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth()
+                .padding(50.dp),
             onClick = {
                 if (viewModel.createAccount) {
                     viewModel.createUser(usernameAttempt, passwordAttempt)
@@ -116,7 +160,10 @@ fun LoginScreen(viewModel: UserViewModel, context: Context, navController: NavCo
             }
         }
         if (viewModel.errorText != null) {
-            Text(viewModel.errorText!!, Modifier.align(Alignment.CenterHorizontally))
+            Text(
+                viewModel.errorText!!,
+                Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }

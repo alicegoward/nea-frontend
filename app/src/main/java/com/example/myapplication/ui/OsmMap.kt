@@ -1,7 +1,6 @@
 package com.example.myapplication.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,8 +38,13 @@ import java.util.Locale
  * @param navController navigation
  */
 @Composable
-fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: NavController) {
-    val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+fun OsmdroidMapView(
+    viewModel: RouteViewModel,
+    context: Context,
+    navController: NavController
+) {
+    val fusedLocationProviderClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
     viewModel.getLocation(fusedLocationProviderClient)
     AndroidView(
         modifier = Modifier
@@ -54,27 +58,37 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
                 controller.setZoom(17.5)
             }
         },
-        update = {
-                mapView ->
+        update = { mapView ->
             run {
-                if (viewModel.position != GeoPoint(0.0,0.0)) {
+                if (viewModel.position !=
+                    GeoPoint(0.0, 0.0)) {
                     val location = Marker(mapView).apply {
                         position = viewModel.position
                         setInfoWindow(null)
-                        icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.current_location)
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        icon = ContextCompat.getDrawable(
+                            context,
+                            com.example
+                                .myapplication.R.drawable.current_location
+                        )
+                        setAnchor(
+                            Marker.ANCHOR_CENTER,
+                            Marker.ANCHOR_CENTER
+                        )
                     }
                     if (mapView.overlays.isEmpty()) {
                         mapView.controller.setCenter(viewModel.position)
                     }
                     mapView.overlays.clear()
                     mapView.overlays.add(location)
-                    Log.d("route geometry size", viewModel.otherRoutes.size.toString())
                     viewModel.otherRoutes.forEach {
-                        Log.d("route geometry maybe", it.value.toString())
                         mapView.overlays.add(Polyline().apply {
                             setPoints(it.value)
-                            color = android.graphics.Color.argb(255,50,50,200)
+                            color = android.graphics.Color.argb(
+                                255,
+                                50,
+                                50,
+                                200
+                            )
                         })
                     }
                     mapView.overlays.add(Polyline().apply {
@@ -84,16 +98,29 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
                         mapView.overlays.add(Marker(mapView).apply {
                             position = it
                             setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.waypoint)
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                            icon = ContextCompat.getDrawable(
+                                context,
+                                com.example
+                                    .myapplication.R.drawable.waypoint
+                            )
+                            setAnchor(
+                                Marker.ANCHOR_CENTER,
+                                Marker.ANCHOR_CENTER
+                            )
                         })
                     }
                     if (viewModel.routePoints.isNotEmpty()) {
                         mapView.overlays.add(Marker(mapView).apply {
                             position = viewModel.routePoints.last()
                             setInfoWindow(null)
-                            icon = ContextCompat.getDrawable(context, com.example.myapplication.R.drawable.end)
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            icon = ContextCompat.getDrawable(
+                                context,
+                                com.example.myapplication.R.drawable.end
+                            )
+                            setAnchor(
+                                Marker.ANCHOR_CENTER,
+                                Marker.ANCHOR_BOTTOM
+                            )
                         })
                     }
 
@@ -102,24 +129,47 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
             }
         }
     )
-    outerScaffold (navController, viewModel) {
+    outerScaffold(navController, viewModel) {
         if (viewModel.itineraries != null) {
-            Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
                 Spacer(Modifier.height(60.dp))
                 for (itinerary in viewModel.itineraries!!) {
-                    Row(Modifier.padding(horizontal = 30.dp, vertical = 10.dp)) {
+                    Row(
+                        Modifier.padding(
+                            horizontal = 30.dp,
+                            vertical = 10.dp
+                        )
+                    ) {
                         Text(itinerary.username)
                         Spacer(Modifier.weight(1F))
                         Text(
-                            SimpleDateFormat("HH:mm",Locale.UK).format(Date(itinerary.eta.toLong() * 1000))
+                            SimpleDateFormat("HH:mm", Locale.UK)
+                                .format(Date(
+                                    itinerary.eta.toLong() * 1000)
+                            )
                         )
                     }
                     for (waypoint in itinerary.waypoints.values) {
                         Row(Modifier.padding(horizontal = 30.dp)) {
                             Spacer(Modifier.width(30.dp))
-                            Text(viewModel.convertToParticipants(waypoint.participants.values.toMutableList(), itinerary.username))
+                            Text(
+                                viewModel.convertToParticipants(
+                                    waypoint.participants
+                                        .values.toMutableList(),
+                                    itinerary.username
+                                )
+                            )
                             Spacer(Modifier.weight(1F))
-                            Text(SimpleDateFormat("HH:mm", Locale.UK).format(Date(waypoint.eta.toLong() * 1000))
+                            Text(
+                                SimpleDateFormat(
+                                    "HH:mm",
+                                    Locale.UK
+                                ).format(Date(
+                                    waypoint.eta.toLong() * 1000))
                             )
                         }
                     }
@@ -127,12 +177,14 @@ fun OsmdroidMapView(viewModel: RouteViewModel, context: Context, navController: 
                 Row {
                     TextButton(
                         content = { Text("Notify late") },
-                        onClick = { viewModel.sendOthersNotification("late") },
+                        onClick = { viewModel
+                            .sendOthersNotification("late") },
                         modifier = Modifier.weight(1f),
                     )
                     TextButton(
                         content = { Text("Notify lost") },
-                        onClick = { viewModel.sendOthersNotification("lost") },
+                        onClick = { viewModel
+                            .sendOthersNotification("lost") },
                         modifier = Modifier.weight(1f),
                     )
                 }

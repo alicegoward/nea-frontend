@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,16 +26,22 @@ import java.time.Instant
 /**
  * Service that runs in the background while a route is activated.
  */
-class LogLocation: Service() {
+class LogLocation : Service() {
     private lateinit var locationCallback: LocationCallback
-    val mainAPI: MainAPI = RetrofitHelper.getInstance().create(MainAPI::class.java)
+    val mainAPI: MainAPI =
+        RetrofitHelper.getInstance().create(MainAPI::class.java)
 
     /**
      * Creates the location callback and sends the results to the server.
-     * Creates a notification to display to the user that location is being recorded
+     * Creates a notification to display to the user that location is
+     * being recorded
      */
     @SuppressLint("MissingPermission")
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         val name = "location"
         val importance = NotificationManager.IMPORTANCE_LOW
         val channel = NotificationChannel("location", name, importance)
@@ -49,40 +54,58 @@ class LogLocation: Service() {
             .setContentText("Currently recording location")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
-            .setContentIntent(Intent(this, MainActivity::class.java).let { notificationIntent ->
-                PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-            })
+            .setContentIntent(
+                Intent(
+                    this,
+                    MainActivity::class.java
+                ).let { notificationIntent ->
+                    PendingIntent.getActivity(
+                        this,
+                        0,
+                        notificationIntent,
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
+                })
         val notification = builder.build()
         notification.flags = Notification.FLAG_ONGOING_EVENT
-        ServiceCompat.startForeground(this,1,notification,ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+        ServiceCompat.startForeground(
+            this,
+            1,
+            notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+        )
         locationCallback = object : LocationCallback() {
-            private var lastPostTime = 0L
             /**
              * On receiving each location, sends the result to the server
              */
             override fun onLocationResult(p0: LocationResult) {
                 val location = p0.locations[p0.locations.lastIndex]
-                Log.d("location",location.latitude.toString())
-                val now = System.currentTimeMillis()
-                if (now - lastPostTime >= 5000) {
-                    CoroutineScope(Dispatchers.IO).launch {
-
-                        try {
-                            mainAPI.postData(
-                                LocationData(
-                                    Instant.now().epochSecond,
-                                    Coordinate(location.latitude, location.longitude)
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        mainAPI.postData(
+                            LocationData(
+                                Instant.now().epochSecond,
+                                Coordinate(
+                                    location.latitude,
+                                    location.longitude
                                 )
                             )
-                        } catch (_: Exception) {
-                        }
+                        )
+                    } catch (_: Exception) {
                     }
                 }
             }
         }
-        val locationRequest = LocationRequest.Builder(10000).setMinUpdateIntervalMillis(5000).setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
-        val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,Looper.getMainLooper())
+        val locationRequest =
+            LocationRequest.Builder(10000).setMinUpdateIntervalMillis(5000)
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build()
+        val fusedLocationClient: FusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
         return START_STICKY
     }
 
@@ -95,7 +118,8 @@ class LogLocation: Service() {
      */
     override fun onDestroy() {
         super.onDestroy()
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }

@@ -33,14 +33,19 @@ import kotlinx.coroutines.launch
 
 /**
  * Displays all incoming / outgoing / full friends
- * Options to accept or decline incoming friend requests and send requests to others
+ * Options to accept or decline incoming friend requests and send
+ * requests to others
  * @param viewModel user view model
  * @param navController navigation
  * @param context application context
  */
 @Composable
-fun FriendScreen(viewModel: UserViewModel, navController: NavController, context: Context) {
-    var currentFriend by remember {mutableStateOf("")}
+fun FriendScreen(
+    viewModel: UserViewModel,
+    navController: NavController,
+    context: Context
+) {
+    var currentFriend by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     outerScaffold(navController, viewModel) {
         Row(
@@ -52,7 +57,8 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
                 onClick = {
                     coroutineScope.launch {
                         viewModel.logout()
-                        val userDao = AppDatabase.getInstance(context).UserDao()
+                        val userDao =
+                            AppDatabase.getInstance(context).UserDao()
                         userDao.deleteUser()
                         navController.navigate("loginScreen")
                     }
@@ -70,15 +76,28 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
             Text("Friend requests", fontSize = 20.sp)
             if (viewModel.pendingRequests != null) {
                 for (request: String in viewModel.pendingRequests!!) {
-                    Row(Modifier.fillMaxWidth(),  verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(request)
                         Spacer(modifier = Modifier.weight(1F))
-                        TextButton (
-                            onClick = { viewModel.updateRequest(request, "accepted") },
+                        TextButton(
+                            onClick = {
+                                viewModel.updateRequest(
+                                    request,
+                                    "accepted"
+                                )
+                            },
                             content = { Text("Accept") }
                         )
-                        TextButton (
-                            onClick = { viewModel.updateRequest(request, "declined") },
+                        TextButton(
+                            onClick = {
+                                viewModel.updateRequest(
+                                    request,
+                                    "declined"
+                                )
+                            },
                             content = { Text("Decline") }
                         )
                     }
@@ -91,7 +110,10 @@ fun FriendScreen(viewModel: UserViewModel, navController: NavController, context
                     Row { Text(request) }
                 }
             }
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 OutlinedTextField(
                     modifier = Modifier.width(200.dp),
                     value = currentFriend,

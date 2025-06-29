@@ -3,7 +3,6 @@ package com.example.myapplication.ui
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -59,7 +58,12 @@ import java.util.Calendar
  * @param navController navigation
  */
 @Composable
-fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context: Context, navController: NavController) {
+fun CreateRoute(
+    viewModel: RouteViewModel,
+    userViewModel: UserViewModel,
+    context: Context,
+    navController: NavController
+) {
     displaySnackbar(viewModel)
     if (viewModel.routeCreation.state == RouteState.CHOOSE_LOCATION) {
         displayMap(viewModel, context)
@@ -74,12 +78,18 @@ fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context
         Spacer(Modifier.weight(1F))
         Row {
             TextButton(
-                onClick = { viewModel.routeCreation.state = viewModel.routeCreation.state.prev() },
+                onClick = {
+                    viewModel.routeCreation.state =
+                        viewModel.routeCreation.state.prev()
+                },
                 content = { Text("Back") }
             )
             Spacer(Modifier.weight(1F))
             TextButton(
-                onClick = { viewModel.routeCreation.state = viewModel.routeCreation.state.next() },
+                onClick = {
+                    viewModel.routeCreation.state =
+                        viewModel.routeCreation.state.next()
+                },
                 content = { Text("Next") }
             )
         }
@@ -90,10 +100,15 @@ fun CreateRoute(viewModel: RouteViewModel, userViewModel: UserViewModel, context
  * first route creation screen - inputs the route name and participants
  * @param routeViewModel route view model
  * @param userViewModel user view model
- * @param name whether the route name should also be inputted (false in edit mode)
+ * @param name whether the route name should also be inputted (false in
+ * edit mode)
  */
 @Composable
-fun start(routeViewModel: RouteViewModel, userViewModel: UserViewModel, name: Boolean) {
+fun start(
+    routeViewModel: RouteViewModel,
+    userViewModel: UserViewModel,
+    name: Boolean
+) {
     if (name) {
         Text("Route name", fontSize = 20.sp)
         OutlinedTextField(
@@ -110,12 +125,20 @@ fun start(routeViewModel: RouteViewModel, userViewModel: UserViewModel, name: Bo
                 Spacer(modifier = Modifier.weight(1F))
                 if (friend in routeViewModel.routeCreation.friends) {
                     Button(
-                        onClick = { routeViewModel.routeCreation.friends.remove(friend) },
+                        onClick = {
+                            routeViewModel.routeCreation.friends.remove(
+                                friend
+                            )
+                        },
                         content = { Text("Remove") }
                     )
                 } else {
                     Button(
-                        onClick = { routeViewModel.routeCreation.friends.add(friend) },
+                        onClick = {
+                            routeViewModel.routeCreation.friends.add(
+                                friend
+                            )
+                        },
                         content = { Text("Add") }
                     )
                 }
@@ -154,7 +177,11 @@ fun chooseEndTime(viewModel: RouteViewModel) {
         is24Hour = true,
     )
     Column {
-        Text("Select meeting time", Modifier.align(Alignment.CenterHorizontally), fontSize = 20.sp)
+        Text(
+            "Select meeting time",
+            Modifier.align(Alignment.CenterHorizontally),
+            fontSize = 20.sp
+        )
         Spacer(Modifier.height(20.dp))
         Row {
             Spacer(Modifier.weight(0.5f))
@@ -211,7 +238,8 @@ fun chooseEndTime(viewModel: RouteViewModel) {
                         Spacer(Modifier.width(8.dp))
                         TextButton(onClick = {
                             viewModel.routeCreation.endTime =
-                                (timePickerState.hour * 60 + timePickerState.minute) * 60
+                                (timePickerState.hour * 60
+                                        + timePickerState.minute) * 60
                             showTimePicker = false
                         }) {
                             Text("OK")
@@ -232,8 +260,8 @@ fun chooseEndTime(viewModel: RouteViewModel) {
 }
 
 /**
- * choose location screen - move the map until the pin is over the desired location
- * Not in a column due to rendering issues
+ * choose location screen - move the map until the pin is over the
+ * desired location. Not in a column due to rendering issues
  * @param viewModel route view model
  * @param context application context
  */
@@ -256,19 +284,22 @@ fun displayMap(viewModel: RouteViewModel, context: Context) {
                 mapView.addMapListener(object : MapListener {
                     override fun onScroll(event: ScrollEvent?): Boolean {
                         event?.let {
-                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
+                            viewModel.routeCreation.endLocation =
+                                mapView.mapCenter as GeoPoint
                         }
                         return true
                     }
 
                     override fun onZoom(event: ZoomEvent?): Boolean {
                         event?.let {
-                            viewModel.routeCreation.endLocation = mapView.mapCenter as GeoPoint
+                            viewModel.routeCreation.endLocation =
+                                mapView.mapCenter as GeoPoint
                         }
                         return true
                     }
                 })
-                if (viewModel.position != GeoPoint(0.0, 0.0)) {
+                if (viewModel.position !=
+                    GeoPoint(0.0, 0.0)) {
                     val location = Marker(mapView).apply {
                         position = viewModel.position
                         setInfoWindow(null)
@@ -276,7 +307,10 @@ fun displayMap(viewModel: RouteViewModel, context: Context) {
                             context,
                             R.drawable.current_location
                         )
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        setAnchor(
+                            Marker.ANCHOR_CENTER,
+                            Marker.ANCHOR_CENTER
+                        )
 
                     }
                     val endPoint = Marker(mapView).apply {
@@ -286,9 +320,11 @@ fun displayMap(viewModel: RouteViewModel, context: Context) {
                             context,
                             R.drawable.end
                         )
-                        setAnchor(Marker.ANCHOR_BOTTOM, Marker.ANCHOR_CENTER)
+                        setAnchor(
+                            Marker.ANCHOR_BOTTOM,
+                            Marker.ANCHOR_CENTER
+                        )
                     }
-                    Log.d("location central", viewModel.routeCreation.endLocation.toString())
                     if (mapView.overlays.isEmpty()) {
                         mapView.overlays.add(location)
                         mapView.overlays.add(endPoint)
@@ -297,7 +333,6 @@ fun displayMap(viewModel: RouteViewModel, context: Context) {
                         mapView.overlays[0] = location
                         mapView.overlays[1] = endPoint
                     }
-                    Log.d("end location", viewModel.routeCreation.endLocation.toString())
                     mapView.invalidate()
                 }
             }

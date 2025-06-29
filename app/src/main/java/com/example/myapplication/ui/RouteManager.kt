@@ -25,13 +25,18 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 /**
- * displays list of routes with option to activate or view information about each one
+ * displays list of routes with option to activate or view information
+ * about each one
  * @param viewModel route view model
  * @param context application context
  * @param navController navigation
  */
 @Composable
-fun RouteManager(viewModel: RouteViewModel, context: Context, navController: NavController) {
+fun RouteManager(
+    viewModel: RouteViewModel,
+    context: Context,
+    navController: NavController
+) {
     if (viewModel.routes == emptyList<RouteInfo>()) {
         viewModel.getRoutes()
     }
@@ -43,28 +48,49 @@ fun RouteManager(viewModel: RouteViewModel, context: Context, navController: Nav
     viewModel.getLocation(fusedLocationClient)
     outerScaffold(navController, viewModel) {
         Column(
-            modifier = Modifier.padding(top=40.dp).verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .padding(top = 40.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Text("My routes", fontSize = 20.sp, modifier = Modifier.padding(vertical = 15.dp, horizontal=30.dp))
+            Text(
+                "My routes",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(
+                    vertical = 15.dp,
+                    horizontal = 30.dp
+                )
+            )
             for (route in viewModel.routes) {
-                Row(modifier = Modifier.padding(horizontal = 30.dp, vertical = 15.dp)) {
+                Row(
+                    modifier = Modifier.padding(
+                        horizontal = 30.dp,
+                        vertical = 15.dp
+                    )
+                ) {
                     Text(route.name)
                     Spacer(Modifier.weight(1F))
                     Column(horizontalAlignment = Alignment.End) {
                         Button(
                             onClick = {
                                 if (viewModel.activeRoute == route) {
-                                    context.stopService(Intent(context, LogLocation::class.java))
+                                    context.stopService(
+                                        Intent(
+                                            context,
+                                            LogLocation::class.java
+                                        )
+                                    )
                                 }
                                 viewModel.activateRoute(route)
                             },
                             content = {
-                                if (viewModel.activeRoute == route) Text("Deactivate")
+                                if (viewModel.activeRoute == route)
+                                    Text("Deactivate")
                                 else Text("Activate")
                             }
                         )
-                        TextButton (
-                            onClick = { navController.navigate("route_info/${route.name}") },
+                        TextButton(
+                            onClick = { navController.navigate(
+                                "route_info/${route.name}") },
                             content = { Text("More info") }
                         )
                     }

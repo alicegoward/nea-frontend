@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,10 +7,13 @@ import androidx.compose.runtime.setValue
 /**
  * view model that aspects user-related aspects of the application
  */
-class UserViewModel: MainViewModel() {
-    var friends: MutableCollection<String>? by mutableStateOf(null)
-    var outgoingRequests: MutableCollection<String>? by mutableStateOf(null)
-    var pendingRequests: MutableCollection<String>? by mutableStateOf(null)
+class UserViewModel : MainViewModel() {
+    var friends:
+            MutableCollection<String>? by mutableStateOf(null)
+    var outgoingRequests:
+            MutableCollection<String>? by mutableStateOf(null)
+    var pendingRequests:
+            MutableCollection<String>? by mutableStateOf(null)
     var createAccount by mutableStateOf(false)
     var errorAddFriend: String? by mutableStateOf(null)
 
@@ -22,7 +24,6 @@ class UserViewModel: MainViewModel() {
         getData {
             if (user != null) {
                 val data = mainAPI.getFriends().body()
-                Log.d("maybe some data", data.toString())
                 friends = data?.names?.values
                 pendingRequests = data?.incoming?.values
                 outgoingRequests = data?.outgoing?.values
@@ -52,7 +53,6 @@ class UserViewModel: MainViewModel() {
                     userRequested = toAdd
                 )
             )
-            Log.d("friend data", data.body().toString() + data.code())
             errorAddFriend = data.body()?.reason
             getFriends()
         }
@@ -62,7 +62,7 @@ class UserViewModel: MainViewModel() {
      * logs user out of view model
      */
     fun logout() {
-        user=null
+        user = null
         password = null
         friends = null
     }

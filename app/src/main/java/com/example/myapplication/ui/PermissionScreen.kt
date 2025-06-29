@@ -16,7 +16,8 @@ import com.example.myapplication.UserViewModel
 import com.example.myapplication.checkPermissions
 
 /**
- * Screen that launches various permissions (should be shown briefly, if at all)
+ * Screen that launches various permissions (should be shown briefly,
+ * if at all)
  * @param singlePermission launcher for one permission
  * @param multiplePermission launcher for multiple permissions
  * @param viewModel route view model
@@ -24,18 +25,35 @@ import com.example.myapplication.checkPermissions
  * @param navController navigation
  */
 @Composable
-fun PermissionScreen(singlePermission: ActivityResultLauncher<String>,
-                     multiplePermission: ActivityResultLauncher<Array<String>>,
-                     viewModel: RouteViewModel,
-                     context: Context,
-                     navController: NavController) {
-    checkPermissions(true, singlePermission, multiplePermission, context, viewModel)
-    Button(content = { Text(text=viewModel.buttonText) },
+fun PermissionScreen(
+    singlePermission: ActivityResultLauncher<String>,
+    multiplePermission: ActivityResultLauncher<Array<String>>,
+    viewModel: RouteViewModel,
+    context: Context,
+    navController: NavController
+) {
+    checkPermissions(
+        true,
+        singlePermission,
+        multiplePermission,
+        context,
+        viewModel
+    )
+    Button(
+        content = { Text(text = viewModel.buttonText) },
         onClick = {
-            checkPermissions(true, singlePermission, multiplePermission, context, viewModel)
+            checkPermissions(
+                true,
+                singlePermission,
+                multiplePermission,
+                context,
+                viewModel
+            )
         },
-        modifier = Modifier.padding(60.dp))
+        modifier = Modifier.padding(60.dp)
+    )
     if (viewModel.permissionsDone) {
-        LaunchedEffect(true) { navController.navigate("loginScreen") }
+        LaunchedEffect(true) {
+            navController.navigate("loginScreen") }
     }
 }

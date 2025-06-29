@@ -10,16 +10,20 @@ import retrofit2.http.POST
  */
 interface MainAPI {
     @POST("user/login")
-    suspend fun loginUser(@Body userDataModel: UsernamePassword): Response<UserInfo>
+    suspend fun loginUser(@Body userDataModel: UsernamePassword):
+            Response<UserInfo>
 
     @POST("user/register")
-    suspend fun postUserData(@Body userDataModel: UsernamePassword): Response<Success>
+    suspend fun postUserData(@Body userDataModel: UsernamePassword):
+            Response<Success>
 
     @POST("user/add_friend")
-    suspend fun addFriend(@Body addFriendModel: AddFriend): Response<Success>
+    suspend fun addFriend(@Body addFriendModel: AddFriend):
+            Response<Success>
 
     @POST("user/update_friend_state")
-    suspend fun updateRequest(@Body updateRequestModel: UpdateRequest): Response<Success>
+    suspend fun updateRequest(@Body updateRequestModel: UpdateRequest):
+            Response<Success>
 
     @GET("user/notifications")
     suspend fun getNotificationData(): Response<NotificationData>
@@ -31,7 +35,8 @@ interface MainAPI {
     suspend fun getRoutes(): Response<RouteDataList>
 
     @POST("add_location")
-    suspend fun postData(@Body locationDataModel: LocationData): Response<Track>
+    suspend fun postData(@Body locationDataModel: LocationData):
+            Response<Track>
 
     @POST("route/create")
     suspend fun postRoute(@Body routeModel: RouteData): Response<Success>
@@ -43,25 +48,31 @@ interface MainAPI {
     suspend fun deactivateRoute(): Response<Success>
 
     @POST("route/update")
-    suspend fun updateRoute(@Body updateRoute: Map<String, String>): Response<Success>
+    suspend fun updateRoute(@Body updateRoute: Map<String, String>):
+            Response<Success>
 
     @POST("route/delete")
-    suspend fun deleteRoute(@Body userOnRoute: UserOnRoute): Response<Success>
+    suspend fun deleteRoute(@Body userOnRoute: UserOnRoute):
+            Response<Success>
 
     @POST("route/get_individual_config")
-    suspend fun getIndividualConfig(@Body userOnRoute: UserOnRoute): Response<ConfigData>
+    suspend fun getIndividualConfig(@Body userOnRoute: UserOnRoute):
+            Response<ConfigData>
 
     @POST("route/set_individual_config")
-    suspend fun setIndividualConfig(@Body configData: ConfigData): Response<Success>
+    suspend fun setIndividualConfig(@Body configData: ConfigData):
+            Response<Success>
 
     @POST("route/notify_others")
-    suspend fun notifyOthers(@Body dataToNotify: DataToNotify): Response<Success>
+    suspend fun notifyOthers(@Body dataToNotify: DataToNotify):
+            Response<Success>
 }
 
 /**
  * @param geometry Enumerated dictionary of lat/long points
  * @param dist Total length of the path
- * @param other_paths Dictionary of usernames, each of which contain an enumerated dictionary of coordinates
+ * @param other_paths Dictionary of usernames, each of which contain
+ * an enumerated dictionary of coordinates
  * @param waypoints Dictionary of coordinates of waypoints
  * @param itineraries Enumerated dictionary of itinerary
  */
@@ -107,16 +118,19 @@ data class ItineraryWaypoint(
 /**
  * @param route name of route
  */
-data class UserOnRoute (
+data class UserOnRoute(
     val route: String
 )
 
 /**
  * @param route name of route
  * @param create_mor whether the user is configured to meet on route
- * @param mor_tolerance_s how many extra seconds the route can take to include a meet on route
- * @param reroute_tolerance_m how many meters of course the user will go before rerouting
- * @param auto_notify_late how many seconds late the person can be before an automatic notification is sent
+ * @param mor_tolerance_s how many extra seconds the route can take to
+ * include a meet on route
+ * @param reroute_tolerance_m how many meters of course the user will
+ * go before rerouting
+ * @param auto_notify_late how many seconds late the person can be
+ * before an automatic notification is sent
  */
 data class ConfigData(
     val route: String,
@@ -140,7 +154,7 @@ data class Coordinate(
  * @param datetime current time
  * @param route route name
  */
-data class Routing (
+data class Routing(
     val position: Coordinate,
     val datetime: Long,
     val route: String
@@ -175,7 +189,7 @@ data class RouteData(
 /**
  * @param notifications dictionary of notifications directed at user
  */
-data class NotificationData (
+data class NotificationData(
     val notifications: HashMap<Int, String>,
 )
 
@@ -183,7 +197,7 @@ data class NotificationData (
  * @param token authentication token
  * @param reason reason for login failure
  */
-data class UserInfo (
+data class UserInfo(
     val token: String,
     val reason: String
 )
@@ -192,7 +206,7 @@ data class UserInfo (
  * @param datetime time at which location data was recorded
  * @param position coordinate of person
  */
-data class LocationData (
+data class LocationData(
     val datetime: Long,
     val position: Coordinate
 )
@@ -225,7 +239,8 @@ data class Success(
 /**
  * @param names enumerated dictionary of current friends
  * @param incoming enumerated dictionary incoming friend requests
- * @param outgoing enumerated dictionary of friend requests that have been sent but not acted upon
+ * @param outgoing enumerated dictionary of friend requests that have
+ * been sent but not acted upon
  */
 data class Friends(
     val names: HashMap<Int, String>,

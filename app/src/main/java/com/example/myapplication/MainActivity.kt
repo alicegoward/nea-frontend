@@ -14,7 +14,8 @@ import org.osmdroid.library.BuildConfig
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var multiplePermission: ActivityResultLauncher<Array<String>>
+    private lateinit var multiplePermission:
+            ActivityResultLauncher<Array<String>>
     private lateinit var singlePermission: ActivityResultLauncher<String>
 
     /**
@@ -22,20 +23,49 @@ class MainActivity : ComponentActivity() {
      * Runs navigation, which displays the relevant screen.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        val userViewModel : UserViewModel by viewModels()
-        val routeViewModel : RouteViewModel by viewModels()
-        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
-        multiplePermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, routeViewModel)
-        }
-        singlePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            checkPermissions(true, singlePermission, multiplePermission, this, routeViewModel)
-        }
+        val userViewModel: UserViewModel by viewModels()
+        val routeViewModel: RouteViewModel by viewModels()
+        Configuration.getInstance().userAgentValue =
+            BuildConfig.LIBRARY_PACKAGE_NAME
+        multiplePermission =
+            registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()) {
+                checkPermissions(
+                    true,
+                    singlePermission,
+                    multiplePermission,
+                    this,
+                    routeViewModel
+                )
+            }
+        singlePermission =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()) {
+                checkPermissions(
+                    true,
+                    singlePermission,
+                    multiplePermission,
+                    this,
+                    routeViewModel
+                )
+            }
         super.onCreate(savedInstanceState)
-        checkPermissions(false, singlePermission, multiplePermission, this, routeViewModel)
+        checkPermissions(
+            false,
+            singlePermission,
+            multiplePermission,
+            this,
+            routeViewModel
+        )
         enableEdgeToEdge()
-        setContent{
-            Navigation(this, userViewModel, routeViewModel, singlePermission, multiplePermission)
+        setContent {
+            Navigation(
+                this,
+                userViewModel,
+                routeViewModel,
+                singlePermission,
+                multiplePermission
+            )
         }
     }
 }

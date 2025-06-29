@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit
  * Preconfigured Retrofit instance using OkHttpClient
  */
 object RetrofitHelper {
-    private const val BASE_URL = "https://nea.uksouth.cloudapp.azure.com/api/"
-    //private const val BASE_URL = "http://192.168.137.1:8000/api/"
+    private const val BASE_URL =
+        "https://nea.uksouth.cloudapp.azure.com/api/"
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
