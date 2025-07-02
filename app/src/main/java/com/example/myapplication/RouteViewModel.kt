@@ -212,8 +212,6 @@ class RouteViewModel : MainViewModel() {
                         }
                     }
                 }
-                position = GeoPoint(location.latitude, location.longitude)
-
             }
         }
         val locationRequest =
