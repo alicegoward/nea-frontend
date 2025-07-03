@@ -32,7 +32,8 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Displays a map with overlays for current location and data about active route (if relevant)
+ * Displays a map with overlays for current location and data about
+ * the active route (if relevant)
  * @param viewModel route view model
  * @param context application context
  * @param navController navigation
